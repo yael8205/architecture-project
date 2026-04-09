@@ -1,0 +1,2 @@
+2026-03-01 21:29:39.828 +02:00 [INF] Starting Store API application
+{"@t":"2026-03-01T19:32:30.0002134Z","@mt":"Starting Store API application"}

@@ -1,0 +1,106 @@
+<div class="register-container flex justify-center items-center min-h-screen">
+  <p-card class="register-card shadow-lg mx-auto w-full max-w-[28rem]">
+    
+    <div class="text-center mb-6">
+      <h2 class="text-3xl font-bold" [style.color]="orgService.currentOrg()?.primaryColor">
+        יצירת חשבון
+      </h2>
+      <p class="text-gray-500">הצטרפו למכירה הסינית של {{ orgService.currentOrg()?.name }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="flex flex-column gap-4">
+      
+      <div class="field">
+        <p-floatLabel>
+          <input pInputText id="name" name="name" [(ngModel)]="user.name" 
+          [disabled]="isLoading"
+                 class="w-full" required #nameRef="ngModel"
+                 [class.ng-dirty]="nameRef.invalid && (nameRef.dirty || nameRef.touched)" />
+          <label for="name">שם מלא</label>
+        </p-floatLabel>
+        @if (nameRef.invalid && (nameRef.dirty || nameRef.touched)) {
+          <small class="text-red-400 block mt-1">שדה שם הוא חובה</small>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <input pInputText id="email" name="email" [(ngModel)]="user.email" 
+          [disabled]="isLoading"
+                 class="w-full" required email pattern=".+@.+\..+" #emailRef="ngModel"
+                 [class.ng-dirty]="emailRef.invalid && (emailRef.dirty || emailRef.touched)" />
+          <label for="email">כתובת אימייל</label>
+        </p-floatLabel>
+        @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
+          <small class="text-red-400 block mt-1">נא להזין אימייל תקין</small>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <p-password id="password" name="password" [(ngModel)]="user.password" 
+          [disabled]="isLoading"
+                      [toggleMask]="true" [feedback]="true" [minlength]="6"
+                      styleClass="w-full" inputStyleClass="w-full" 
+                      [required]="true" #passRef="ngModel"
+                      [class.ng-dirty]="passRef.invalid && (passRef.dirty || passRef.touched)">
+          </p-password>
+          <label for="password">סיסמה (לפחות 6 תווים)</label>
+        </p-floatLabel>
+        @if (passRef.invalid && (passRef.dirty || passRef.touched)) {
+          <small class="text-red-400 block mt-1">הסיסמה חייבת להכיל לפחות 6 תווים</small>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <input pInputText id="phone" name="phone" [(ngModel)]="user.phone" 
+                 [disabled]="isLoading"
+                 class="w-full" required pattern="^0\d{1,2}-?\d{7}$" #phoneRef="ngModel"
+                 [class.ng-dirty]="phoneRef.invalid && (phoneRef.dirty || phoneRef.touched)" />
+          <label for="phone">מספר טלפון</label>
+        </p-floatLabel>
+        @if (phoneRef.invalid && (phoneRef.dirty || phoneRef.touched)) {
+          <small class="text-red-400 block mt-1">נא להזין מספר טלפון תקין</small>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <input pInputText id="address" name="address" [(ngModel)]="user.address" 
+          [disabled]="isLoading"
+                 class="w-full" required #addressRef="ngModel"
+                 [class.ng-dirty]="addressRef.invalid && (addressRef.dirty || addressRef.touched)" />
+          <label for="address">כתובת מגורים</label>
+        </p-floatLabel>
+        @if (addressRef.invalid && (addressRef.dirty || addressRef.touched)) {
+          <small class="text-red-400 block mt-1">נא להזין כתובת</small>
+        }
+      </div>
+
+      <button pButton type="submit" label="המשך לבחירת פרסים" 
+              icon="pi pi-arrow-left" iconPos="right" 
+              [disabled]="registerForm.invalid"
+              [style.background-color]="orgService.currentOrg()?.primaryColor"
+              [style.border-color]="orgService.currentOrg()?.primaryColor"
+              [style.color]="orgService.currentOrg()?.accentContrast"
+              [loading]="isLoading"
+              class="w-full mt-2 luxury-button">
+      </button>
+
+      <p class="text-center text-xs text-gray-400">
+        בלחיצה על המשך אתם מאשרים את תקנון המכירה של {{ orgService.currentOrg()?.name }}
+      </p>
+        <div class="text-center mt-4">
+        <p class="text-xs text-gray-400 font-medium">
+       כבר יש לכם חשבון?
+          <a [routerLink]="['/join',orgService.currentOrg()?.slug,'login']" 
+             [style.color]="orgService.currentOrg()?.primaryColor"
+             class="font-bold no-underline cursor-pointer">
+          להתחברות
+          </a>
+        </p>
+      </div>
+    </form>
+  </p-card>
+</div>

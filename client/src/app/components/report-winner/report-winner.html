@@ -1,0 +1,34 @@
+<p-table [value]="winners" rowGroupMode="subheader" groupRowsBy="giftName" [loading]="loading">
+  <ng-template pTemplate="header">
+    <tr [style.color]="currentOrg()?.primaryColor">
+      <th>שם הזוכה</th>
+      <th style="width: 150px">סטטוס</th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="groupheader" let-winner>
+    <tr pRowGroupHeader [style.background]="currentOrg()?.secondaryColor">
+      <td colspan="2">
+        <span class="font-bold" [style.color]="currentOrg()?.primaryColor">
+          🎁 מתנה: {{ winner.giftName }}
+        </span>
+      </td>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-winner>
+    <tr>
+      <td class="winner-cell">
+        <i class="pi pi-user" [style.color]="currentOrg()?.accentColor" style="margin-left: 8px;"></i>
+        {{ winner.winnerName }}
+      </td>
+      <td>
+        <p-tag 
+          value="זוכה מאושר" 
+          [style.background]="currentOrg()?.primaryColor"
+          [style.color]="currentOrg()?.accentContrast">
+        </p-tag>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

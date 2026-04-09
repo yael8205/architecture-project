@@ -1,0 +1,1 @@
+2026-03-01 21:23:53.349 +02:00 [INF] Starting Store API application

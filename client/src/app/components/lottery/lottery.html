@@ -1,0 +1,80 @@
+<div class="lottery-dashboard p-4">
+  <h1 class="text-center dashboard-title mb-6">ניהול הגרלות סינית</h1>
+
+  <div class="grid">
+    @for (gift of gifts(); track gift.id) {
+      <div class="col-12 md:col-6 lg:col-4 p-3">
+        <div class="package-card-glass h-full flex flex-column">
+          
+          <div class="image-wrapper">
+            <img [src]="cartService.getGiftImagePath(gift.pictureUrl || '')" 
+                 class="gift-image-main" 
+                 [alt]="gift.name">
+            <span class="price-badge">{{ gift.cardPrice }} ₪</span>
+            <div class="image-overlay"></div>
+          </div>
+
+          <div class="card-content p-3 flex-grow-1">
+            <h3 class="gift-title mb-2">{{ gift.name }}</h3>
+            <p class="description text-600 line-height-3">{{ gift.description }}</p>
+
+            <div class="stats-container mt-3 p-3 border-round-xl bg-gray-50">
+              <div class="flex justify-content-between mb-2">
+                <span class="label text-500">כרטיסים שנמכרו:</span>
+                <span class="value font-bold text-900">{{ gift.purchasersCount }}</span>
+              </div>
+              <div class="flex justify-content-between">
+                <span class="label text-500">כמות פרסים:</span>
+                <span class="value font-bold text-blue-600">{{ gift.prizeQuantity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions p-3 pt-0">
+            @if (hasWinners(gift)) {
+              <div class="status-complete flex align-items-center justify-content-center p-3 border-round-lg">
+                <i class="pi pi-check-circle mr-2"></i> הגרלה הושלמה
+              </div>
+            } @else {
+              <button 
+                class="btn-run-lottery w-full py-3 border-none border-round-lg cursor-pointer font-bold shadow-2" 
+                [disabled]="isDrawing()"
+                (click)="onRunLottery(gift.id)">
+                @if (isDrawing()) {
+                  <i class="pi pi-spin pi-spinner mr-2"></i> מבצע הגרלה...
+                } @else {
+                  <i class="pi pi-bolt mr-2"></i> בצע הגרלה עכשיו
+                }
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (selectedWinners().length > 0) {
+    <div class="winners-overlay flex align-items-center justify-content-center">
+      <div class="winners-modal p-6 shadow-8 border-round-2xl text-center">
+        <h2 class="text-4xl mb-4 mt-0">🎊 הזוכים המאושרים 🎊</h2>
+        <div class="grid justify-content-center">
+          @for (winner of selectedWinners(); track $index) {
+            <div class="col-12 md:col-6 p-2">
+              <div class="winner-item p-4 border-round-xl shadow-1">
+                <div class="winner-name text-2xl font-bold text-primary mb-2">{{ winner.name }}</div>
+                <div class="winner-info text-600">
+                   <i class="pi pi-phone mr-1"></i> {{ winner.phone }}
+                </div>
+                <div class="winner-info text-600 mt-1">
+                   <i class="pi pi-map-marker mr-1"></i> {{ winner.address }}
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+        <button class="btn-close-modal mt-5 px-6 py-2 border-round-pill cursor-pointer" 
+                (click)="selectedWinners.set([])">סגור תצוגה</button>
+      </div>
+    </div>
+  }
+</div>

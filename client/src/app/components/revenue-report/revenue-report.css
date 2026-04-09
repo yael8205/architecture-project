@@ -1,0 +1,49 @@
+.revenue-wrapper {
+  padding: 2rem;
+  direction: rtl;
+}
+
+/* עיצוב כרטיס דינמי */
+::ng-deep .custom-card .p-card {
+  border-right: 8px solid var(--org-primary); /* פס צבע בצד לפי הארגון */
+  background: linear-gradient(to left, #ffffff, var(--secondary-color));
+  box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+  border-radius: 15px;
+}
+
+.amount-container {
+  text-align: center;
+  margin: 2rem 0;
+  color: var(--org-primary);
+}
+
+.number {
+  font-size: 4rem;
+  font-weight: 900;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.symbol {
+  font-size: 2rem;
+  margin-left: 10px;
+  vertical-align: super;
+}
+
+.meter-section {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+}
+
+.target-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 8px;
+  text-align: left;
+}
+
+/* התאמת צבע הבר של PrimeNG */
+::ng-deep .p-metergroup-bar {
+  background-color: var(--org-primary) !important;
+}

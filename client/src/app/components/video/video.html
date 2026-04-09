@@ -1,0 +1,11 @@
+<div class="video-container">
+    <video #myVideo 
+           class="video-element"
+           [autoplay]="true" 
+           [muted]="true" 
+           [loop]="true"
+           playsinline 
+           preload="auto"
+           [src]=" orgService.currentOrg()?.slug + '/video/videoPackage.mp4'">
+    </video>
+</div>

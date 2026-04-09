@@ -1,0 +1,94 @@
+<div class="card p-4 surface-card shadow-1 border-round">
+  <p-toast></p-toast>
+  <p-confirmDialog dir="rtl"></p-confirmDialog>
+
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div class="flex gap-2">
+      <button pButton label="חדש" icon="pi pi-plus" class="p-button-success border-round-md" (click)="openNew()"></button>
+      <button pButton label="מחיקה" icon="pi pi-trash" class="p-button-danger p-button-outlined border-round-md" 
+              (click)="deleteSelectedDonors()" [disabled]="!selectedDonors().length"></button>
+    </div>
+    <button pButton label="ייצוא CSV" icon="pi pi-upload" 
+            class="p-button-secondary p-button-text surface-200 text-color border-round-md px-3 py-2" 
+            (click)="exportCSV()"></button>
+  </div>
+
+  <p-table #dt [value]="donors()" [(selection)]="selectedDonors" dataKey="id" 
+           [columns]="cols" [paginator]="true" [rows]="10" styleClass="p-datatable-sm shadow-1 border-round">
+    
+    <ng-template pTemplate="caption">
+      <div class="flex flex-wrap gap-2 justify-content-end">
+        <input pInputText type="text" [ngModel]="searchName()" (ngModelChange)="searchName.set($event); filterDonors()" placeholder="סינון לפי שם" class="p-inputtext-sm w-12rem" />
+        <input pInputText type="text" [ngModel]="searchEmail()" (ngModelChange)="searchEmail.set($event); filterDonors()" placeholder="סינון לפי מייל" class="p-inputtext-sm w-12rem" />
+        <input pInputText type="text" [ngModel]="searchGift()" (ngModelChange)="searchGift.set($event); filterDonors()" placeholder="סינון לפי מתנה" class="p-inputtext-sm w-12rem" />
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+        <th pSortableColumn="name">שם <p-sortIcon field="name"></p-sortIcon></th>
+        <th>טלפון</th>
+        <th>אימייל</th>
+        <th style="width: 8rem">פעולות</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-donor>
+      <tr>
+        <td><p-tableCheckbox [value]="donor"></p-tableCheckbox></td>
+        <td class="font-bold text-primary cursor-pointer underline hover:text-primary-700" (click)="showGifts(donor)">
+          {{ donor.name }}
+        </td>
+        <td>{{ donor.phone }}</td>
+        <td>{{ donor.email }}</td>
+        <td>
+          <div class="flex gap-2">
+            <button pButton icon="pi pi-pencil" class="p-button-text p-button-rounded" (click)="editDonor(donor)"></button>
+            <button pButton icon="pi pi-trash" class="p-button-text p-button-rounded p-button-danger" (click)="deleteDonor(donor)"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <p-dialog [(visible)]="donorDialog" header="פרטי תורם" [modal]="true" [style]="{width: '400px'}" styleClass="p-fluid" dir="rtl">
+    <div class="flex flex-column gap-4 mt-3">
+      
+      <div class="flex flex-column gap-2">
+        <label class="font-bold text-900 text-right">שם התורם</label>
+        <input pInputText [(ngModel)]="activeDonor().name" class="border-round" placeholder="שם מלא" />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label class="font-bold text-900 text-right">טלפון</label>
+        <input pInputText [(ngModel)]="activeDonor().phone" class="border-round" placeholder="050-0000000" />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label class="font-bold text-900 text-right">אימייל</label>
+        <input pInputText [(ngModel)]="activeDonor().email" class="border-round" placeholder="email@example.com" />
+      </div>
+
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-end gap-2 mt-4">
+        <button pButton label="ביטול" (click)="donorDialog.set(false)" class="p-button-text p-button-plain"></button>
+        <button pButton label="שמור" (click)="saveDonor()" class="p-button-success border-round px-4"></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="giftDialogVisible" [header]="'מתנות של ' + selectedDonorName()" [modal]="true" [style]="{width: '400px'}" dir="rtl">
+    <div class="p-2 text-right">
+      <input type="text" pInputText placeholder="חפשי מתנה..." class="w-full p-inputtext-sm mb-3 border-round" 
+             [ngModel]="giftFilterText()" (ngModelChange)="giftFilterText.set($event)" />
+      <div class="flex flex-wrap gap-2">
+        <div *ngFor="let gift of filteredGifts()" class="p-2 border-round surface-100 border-1 border-300">
+          <i class="pi pi-gift ml-1 text-green-500"></i> {{ gift }}
+        </div>
+      </div>
+    </div>
+  </p-dialog>
+</div>

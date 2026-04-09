@@ -1,0 +1,17 @@
+<div class="revenue-wrapper" *ngIf="currentOrg()">
+  <p-card [header]="'דוח הכנסות - ' + currentOrg()?.name" class="custom-card">
+    <div class="revenue-body">
+      
+      <div class="amount-container">
+        <span class="symbol">₪</span>
+        <span class="number">{{ totalRevenue() | number:'1.2-2' }}</span>
+      </div>
+
+      <div class="meter-section">
+        <p-meterGroup [value]="meterValue()" labelPosition="start"></p-meterGroup>
+        <p class="target-text">יעד מכירות: ₪1,000,000</p>
+      </div>
+
+    </div>
+  </p-card>
+</div>

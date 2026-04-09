@@ -1,0 +1,8 @@
+loaded_h_0(function(_){var window=this;
+_.Ghh=_.y("T89alf",[_.qi,_.Ddb,_.Cfh]);
+_.v("T89alf");
+var Hhh=class extends _.is{static Sa(){return{Jc:{Gc:_.Sp},service:{Wd:_.r8g,Ng:_.Efh},jsdata:{params:{ctor:_.AR}}}}constructor(a){super(a.Oa);this.Wd=a.service.Wd;this.Ng=a.service.Ng;this.Gc=a.Jc.Gc;this.item=a.jsdata.params.getItem();this.client=a.jsdata.params.Wu();this.XC=_.BR(a.jsdata.params);this.Bma=_.A(a.jsdata.params,17);this.Ng.Sjc(this.getRoot().el())}async oa(a){var b=(0,_.Rf)(),c=b();b=b(1);try{const d=a.rb.el();this.Wd.logClick(d);let e;const f=(e=this.XC)==null?void 0:e.filter(g=>
+_.Bj(g,2)!==3&&_.Bj(g,2)!==4&&_.Bj(g,2)!==5);if(f.length!==0)if(_.yhe&&f.length>1){const g={title:this.Gc.oa(_.Vfh),content:this.Gc.oa(_.Ufh),Wya:this.Gc.oa(_.Vfh),Oqb:this.Gc.oa(_.Tfh),Vb:"AbjLGb"};b(await c(this.Ng.Ca(g))).actionId==="ok"&&this.trigger("RsSTZ",{item:this.item,client:this.client,XC:f,Bma:this.Bma})}else this.trigger("RsSTZ",{item:this.item,client:this.client,XC:f,Bma:this.Bma});this.trigger("llfO5c")}finally{c()}}};Hhh.prototype.$wa$l4nZKc=function(){return this.oa};_.ks(_.Ghh,Hhh);
+_.w();
+});
+// Google Inc.

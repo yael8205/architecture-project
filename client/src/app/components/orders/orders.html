@@ -1,0 +1,75 @@
+<div class="p-4" [style.background-color]="'var(--secondary-color)'">
+  <h2 class="text-3xl font-bold mb-4" [style.color]="'var(--org-primary)'">היסטוריית הזמנות</h2>
+
+  @if (ordersService.loading()) {
+    <div class="grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="col-12 mb-3">
+          <p-skeleton height="150px" borderRadius="15px"></p-skeleton>
+        </div>
+      }
+    </div>
+  } 
+  @else if (ordersService.orders().length === 0) {
+    <div class="text-center p-5 surface-card border-round-xl shadow-1">
+      <i class="pi pi-shopping-cart text-6xl mb-3" [style.color]="'var(--primary-color)'"></i>
+      <h3>עדיין לא ביצעת הזמנות</h3>
+    </div>
+  }
+  @else {
+    <p-dataView [value]="ordersService.orders()" layout="list">
+      <ng-template #list let-items>
+        @for (order of items; track order.id; let i = $index) {
+          <div class="surface-card p-4 shadow-2 border-round-xl mb-4 border-right-3" 
+               [style.border-color]="'var(--primary-color)'">
+            
+            <div class="flex justify-content-between align-items-start mb-3">
+              <div>
+                <span class="text-500 font-medium">
+                  <i class="pi pi-calendar mr-1"></i> {{ order.date | date:'dd/MM/yyyy' }}
+                </span>
+                <div class="text-2xl font-bold mt-1">הזמנה #{{ items.length - i }}</div>
+                <div class="text-sm text-400">מזהה מערכת: {{ order.id }}</div>
+              </div>
+              
+              <div class="text-right">
+                <span class="text-2xl font-bold" [style.color]="'var(--primary-color)'">₪{{ order.sumPrice }}</span>
+                <div class="text-sm text-600 mt-1 font-bold">{{ order.packagesInOrder.length }} חבילות שנרכשו</div>
+              </div>
+            </div>
+
+            <div class="surface-100 p-3 border-round-lg mt-3" style="background-color: rgba(0,0,0,0.03)">
+              @for (pkg of order.packagesInOrder; track pkg.id) {
+                <div class="mb-4 last:mb-0">
+                  <div class="font-bold border-bottom-1 border-300 pb-1 mb-2 flex align-items-center justify-content-between">
+                    <span>📦 {{ pkg.packageName }}</span>
+                    <span class="text-sm text-500">מחיר חבילה: ₪{{ pkg.priceAtPurchase }}</span>
+                  </div>
+                  
+                  <div class="flex flex-wrap gap-3">
+                    @for (gift of pkg.giftsInPackage; track gift.id) {
+                      <div class="bg-white p-2 border-round shadow-1 flex align-items-center gap-3 hover:shadow-2 transition-duration-200" 
+                           style="min-width: 180px;">
+                        
+                        <img [src]="ordersService.getGiftImagePath(gift.giftPictureUrl)" 
+                             (error)="$any($event.target).src = '/images/default-gift.png'"
+                             class="w-3rem h-3rem border-circle shadow-sm object-cover">
+                           
+                        <div class="flex flex-column">
+                          <span class="font-medium text-sm">{{ gift.giftName }}</span>
+                          @if (gift.isWinner) {
+                            <p-tag value="זכייה!" severity="success" [rounded]="true" class="mt-1"></p-tag>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </ng-template>
+    </p-dataView>
+  }
+</div>

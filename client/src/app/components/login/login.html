@@ -1,0 +1,71 @@
+<div class="register-container flex justify-center items-center min-h-screen">
+  <p-card class="register-card shadow-lg mx-auto w-full max-w-[28rem]">
+    
+    <div class="text-center mb-6">
+      <h2 class="text-3xl font-bold" [style.color]="orgService.currentOrg()?.primaryColor">
+        כניסה
+      </h2>
+      <p class="text-gray-500">נא להזין פרטים כדי להתחבר ל{{ orgService.currentOrg()?.name }}</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()" #loginForm="ngForm" class="flex flex-column gap-4">
+      
+      <div class="field">
+        <p-floatLabel>
+          <input pInputText id="email" name="email" [(ngModel)]="user.email" 
+                 [disabled]="isLoading"
+                 class="w-full" required email #emailRef="ngModel"
+                 [class.ng-dirty]="emailRef.invalid && (emailRef.dirty || emailRef.touched)" />
+          <label for="email">כתובת אימייל</label>
+        </p-floatLabel>
+        @if (emailRef.invalid && (emailRef.dirty || emailRef.touched)) {
+          <small class="text-red-400 block mt-1">נא להזין אימייל תקין</small>
+        }
+      </div>
+
+      <div class="field">
+        <p-floatLabel>
+          <p-password 
+            id="password" 
+            name="password" 
+            [(ngModel)]="user.password" 
+            [disabled]="isLoading"
+            [toggleMask]="true" 
+            [feedback]="false" 
+            [minlength]="6"
+            styleClass="w-full" 
+            inputStyleClass="w-full"
+            [required]="true" 
+            #passRef="ngModel"
+            [class.ng-dirty]="passRef.invalid && (passRef.dirty || passRef.touched)">
+          </p-password>
+          <label for="password">סיסמה</label>
+        </p-floatLabel>
+        @if (passRef.invalid && (passRef.dirty || passRef.touched)) {
+          <small class="text-red-400 block mt-1">נא להזין סיסמה תקינה (לפחות 6 תווים)</small>
+        }
+      </div>
+
+      <button pButton type="submit" label="התחברות" 
+              icon="pi pi-user" iconPos="right" 
+              [disabled]="loginForm.invalid"
+              [style.background-color]="orgService.currentOrg()?.primaryColor"
+              [style.border-color]="orgService.currentOrg()?.primaryColor"
+              [style.color]="orgService.currentOrg()?.accentContrast"
+              [loading]="isLoading"
+              class="w-full mt-2 luxury-button py-3">
+      </button>
+
+      <div class="text-center mt-4">
+        <p class="text-xs text-gray-400 font-medium">
+          עדיין אין לכם חשבון? 
+          <a [routerLink]="['/join',orgService.currentOrg()?.slug,'register']" 
+             [style.color]="orgService.currentOrg()?.primaryColor"
+             class="font-bold no-underline cursor-pointer">
+             להרשמה
+          </a>
+        </p>
+      </div>
+    </form>
+  </p-card>
+</div>

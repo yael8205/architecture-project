@@ -1,0 +1,55 @@
+<div class="checkout-container" [style.background-color]="orgService.currentOrg()?.secondaryColor + '20'">
+  <div class="checkout-card">
+    <h2 [style.color]="orgService.currentOrg()?.primaryColor">פרטי תשלום מאובטח</h2>
+    
+    <div class="payment-form">
+      <div class="field">
+        <label>שם בעל הכרטיס</label>
+        <input pInputText type="text" [(ngModel)]="paymentData.name" placeholder="ישראל ישראלי" />
+      </div>
+
+      <div class="field">
+        <label>מספר כרטיס</label>
+        <input pInputText type="text" 
+               [(ngModel)]="paymentData.cardNum" 
+               (keypress)="onlyNumbers($event)" 
+               maxlength="16" 
+               placeholder="**** **** **** ****" />
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>תוקף</label>
+          <input pInputText type="text" 
+                 [(ngModel)]="paymentData.expiry" 
+                 (input)="formatExpiry()" 
+                 maxlength="5" 
+                 placeholder="MM/YY" />
+        </div>
+
+        <div class="field">
+          <label>CVV</label>
+          <input pInputText type="password" 
+                 [(ngModel)]="paymentData.cvv" 
+                 (keypress)="onlyNumbers($event)" 
+                 maxlength="3" 
+                 placeholder="123" />
+        </div>
+      </div>
+
+      <div class="summary-box" [style.border-color]="orgService.currentOrg()?.primaryColor">
+        <span>סה"כ לתשלום:</span>
+        <span class="price" *ngIf="cartService.cart() as cart">
+          {{ cart.sumPrice | currency:'ILS':'symbol':'1.0-0' }}
+        </span>
+      </div>
+
+      <button class="pay-now-btn" 
+              [disabled]="!isFormValid()"
+              [style.background-color]="orgService.currentOrg()?.primaryColor"
+              (click)="processPayment()">
+        בצע תשלום עכשיו
+      </button>
+    </div>
+  </div>
+</div>

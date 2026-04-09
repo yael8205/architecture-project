@@ -1,0 +1,26 @@
+.admin-container {
+  padding: 2rem;
+  direction: rtl;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  align-items: center;
+}
+
+.filter-card {
+  margin-bottom: 2rem;
+  border-right: 5px solid var(--primary);
+}
+
+::ng-deep .p-datatable-thead > tr > th {
+  background-color: var(--secondary-color) !important;
+  color: var(--primary) !important;
+}
+
+::ng-deep .p-inputtext:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 0.2rem var(--secondary-color) !important;
+}

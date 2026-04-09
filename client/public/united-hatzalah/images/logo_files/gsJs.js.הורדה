@@ -1,0 +1,252 @@
+
+var googleSearchHrefs=[];
+var lastArrLen = googleSearchHrefs.length;
+var ntspUserLevel,ntspMediaLevel,ntspLowRedLineUl,ntspIsEtrog;
+var gebn=document.getElementsByName('ntsp_user_level');
+if(gebn.length) ntspUserLevel=gebn[0].value;
+
+gebn=document.getElementsByName('ntsp_media_level');
+if(gebn.length) ntspMediaLevel=gebn[0].value;
+
+gebn=document.getElementsByName('ntsp_min_level');	
+if(gebn.length) ntspLowRedLineUl=gebn[0].value;
+
+gebn=document.getElementsByName('ntsp_is_etrog');
+if(gebn.length) ntspIsEtrog=parseInt(gebn[0].value);
+
+if(ntspMediaLevel > -15 || ntspIsEtrog){
+	const style = document.createElement('style');
+	style.innerHTML = `
+		[data-attrid="images universal"] {
+			opacity: 0 !important;
+			transition: opacity 0.2s ease-in;
+		}
+		[data-attrid="images universal"][image-ntsp-show="true"] {
+			opacity: 1 !important;
+		}
+	`;
+	document.head.appendChild(style);
+}
+
+function createImgSrc(isVideo,hrefToCheck){
+	return `/23898278c1850f536d688db3614128a0/gsjs/${(isVideo?ntspUserLevel:ntspLowRedLineUl)}/${btoa(encodeURI(hrefToCheck))}.png`;
+}
+function filterNewResults(){
+	if(lastArrLen<document.getElementsByTagName("a").length){
+		googleSearchHrefs = document.getElementsByTagName("a");
+		let parentPrevEle,hrefToCheck,isVideo=false,prevEle=null,prevPrevEle;
+		if(ntspMediaLevel>=15){
+			document.querySelector('[jscontroller="s0j7C"]')?.remove();
+		}
+		if(ntspUserLevel>=5){
+			let gScrollingCarousel = document.getElementsByTagName("g-scrolling-carousel");
+			for(let i=0;i<gScrollingCarousel.length;i++) gScrollingCarousel[i].remove();
+			let gSectionWithHeader = document.getElementsByTagName("g-section-with-header");
+			for(let i=0;i<gSectionWithHeader.length;i++) gSectionWithHeader[i].remove();
+			let divs = document.getElementsByTagName("div");
+			for(let i=0;i<divs.length;i++){
+				let classAttr = divs[i].getAttribute("class");
+				if(divs[i].getAttribute("jsmodel")=="QPRQHf") divs[i].remove(); // for places
+				else if(divs[i].getAttribute("id")=="rhs" && divs[i].innerHTML.includes("wikipedia.org")) divs[i].remove();//for wikipedia side bar recognition
+				else if(classAttr=="XqFnDf" || classAttr=="VNzqVe") divs[i].remove();//for overview education... section
+				else if(divs[i].getAttribute("jsaction")=="Q3MUxe:SlcVJb") divs[i].remove();//for businesses section
+				else if(classAttr=="JNkvid gsrt wp-ms" && divs[i].parentElement.getAttribute("class")=="sATSHe") divs[i].parentElement.remove();//for top stories section and lyrics of songs
+				else if(divs[i].getAttribute("id")=="tvcap") divs[i].remove();//for sales ads	
+				else if(classAttr=="twQ0Be") divs[i].remove();//for song video preview
+				else if(classAttr=="AuVD cUnQKe") divs[i].remove();//for people also asked
+				else if(classAttr=="oIk2Cb") divs[i].remove();//for related search
+				else if(divs[i].getAttribute("jscontroller")=="UzbKLd") divs[i].remove();//for video suggestion
+			}
+		}
+//		for(let i=lastArrLen;i<googleSearchHrefs.length;i++){
+		for(let i=0;i<googleSearchHrefs.length;i++){
+			if(googleSearchHrefs[i].children.length<4) continue;
+			if(prevEle){
+				parentPrevEle=prevEle.parentElement;
+				hrefToCheck = prevEle.getAttribute("href");
+				if(!hrefToCheck) continue;
+				for(;parentPrevEle.contains(googleSearchHrefs[i])!=true;prevEle=parentPrevEle,parentPrevEle=prevEle.parentElement);
+				if(ntspUserLevel>=5){
+					let videosInCube=prevEle.getElementsByTagName("video");
+					if(videosInCube.length){
+						isVideo=true;
+					}
+				}
+				var img=document.createElement('img');
+				prevEle.appendChild(img);
+				img.onload = img_onload;
+				img.src=createImgSrc(isVideo,hrefToCheck);
+			}
+			prevPrevEle=prevEle;
+			prevEle=googleSearchHrefs[i];
+		}
+		lastArrLen = googleSearchHrefs.length;
+		if(prevEle){
+			hrefToCheck=prevEle.getAttribute("href");
+			if(!hrefToCheck) return;
+			parentPrevEle=prevEle.parentElement;
+			for(;parentPrevEle.contains(prevPrevEle)!=true;prevEle=parentPrevEle,parentPrevEle=prevEle.parentElement);
+			if(ntspUserLevel>=5){
+				let videosInCube=prevEle.getElementsByTagName("video");
+				if(videosInCube.length){
+					isVideo=true;
+				}
+			}
+			var img=document.createElement('img');
+			prevEle.appendChild(img);
+			img.onload = img_onload;
+			img.src=createImgSrc(isVideo,hrefToCheck);
+		}
+	}
+}
+
+function img_onload(){
+	if(this.naturalHeight!=undefined && this.naturalHeight!=1){
+		let numOfAs = this.parentElement.getElementsByTagName("a").length;
+		this.parentElement.outerHTML="<a href='#'></a>".repeat(numOfAs);
+		this.parentElement.setAttribute("hidden","");
+	}
+}
+setInterval(filterNewResults,2000);
+
+function isImageUrl(new_src) {
+	// invalid url
+	if (!new_src.startsWith("http://") && !new_src.startsWith("https://")) return false;
+	new_src = new_src.toLowerCase();
+	
+	// extracrt path and domain
+	const url = new URL(new_src);
+	var domain = url.hostname;
+	var path = url.pathname;
+
+	// find the last occurence of '.' in path
+	const pos = path.lastIndexOf('.');
+	if (pos != -1){
+			const ext = path.substring(pos+1); // Fetch the extension of the image
+		const invalidImageExtensions = /^(ico|m3u8|json|js|mjs|css|flv|wmv|divx|avi|mpeg|mpg2|ts|mp4|m4s|m4v|webm|f4m|mov|f4v|mp3|ogg|wma|wav|m4a|fnt|fon|otf|ttf|woff2?)$/;
+		if (invalidImageExtensions.test(ext)) return false;
+			
+			const imageExtensions = /^(gif|jpg|webp|bmp|png|swf|jpeg|tif|tiff|svg|svgz|avif)$/;
+			if (imageExtensions.test(ext)) return true;
+	}
+	
+		// Check for common image-related paths
+		if (/\/(?:images|image|img)(?:\/|$)/.test(path)) {
+			return true;
+		}
+
+		//check for common image-related host patterns
+		if (/^(?:.+\.|)(?:images|image|(?:tw|)img)[\.\-]/.test(domain)) {
+		return true;
+		}
+	
+		return false;
+}
+
+
+function toUrlImages(iteration){
+	var pic,curr_img,curr_img_src,cnt_need_change=0,cnt_changed=0;
+	var pics = Array.from(document.querySelectorAll('[data-attrid="images universal"]'));
+
+	for (let i = 0; i < pics.length; i++) {
+		pic = pics[i];
+		curr_img = pic.getElementsByTagName("img")[0];
+
+		if (!curr_img) continue;
+
+		if ((curr_img_src=curr_img.getAttribute("src")) && curr_img_src.substring(0,11)!="data:image/" && curr_img_src.substring(0,17)!= "https://encrypted") {
+			pic.setAttribute('image-ntsp-show','true');
+			continue;
+		}
+
+		cnt_need_change++;
+
+		var value = pic?.__jscontroller?.pending?.value;
+		if (!value) value = pic?.__jscontroller?.instance?.value;
+		if (!value) continue;
+
+		var childrens = Object.values(value); // jscontroller -> pending/instance -> value
+
+		for (let j = childrens.length - 1; j >= 0; j--){
+			var start_structure = childrens[j]; // bC/cC
+			if (!start_structure) continue;
+
+			var first_key = Object.values(start_structure)?.[0]; // Fq/Xr
+			if (!first_key) continue;
+
+			var second_structure = first_key?.[1]; // Fq[1]/Xr[1]
+			if (!second_structure) continue;
+
+			var new_src = Object.values(second_structure)?.[0]?.[3]?.[0]; // Fq/Xr -> [3] -> [0]
+			if (!new_src) continue;
+
+			// change the src of all base64 photos, encrypted photos just if this is src of photo
+			if (curr_img_src.substring(0,17) == "https://encrypted" && !isImageUrl(new_src)) break;
+			cnt_changed++;
+			curr_img.onload = function() {
+				pic.setAttribute('image-ntsp-show','true');
+			};
+			curr_img.src = new_src;
+			break;
+		}
+	}
+	if (iteration <= 2){
+		setTimeout(() => {
+			toUrlImages(iteration+1);
+		},500);
+	}
+
+	else if (cnt_need_change > cnt_changed && iteration < 5) {
+		setTimeout(() => {
+			toUrlImages(iteration + 1);
+		}, 100);
+	}
+}
+
+(function(){
+	// run the script when loading the first page
+	toUrlImages(1);
+
+	// for Mobile clicking
+	document.body.addEventListener("click", (e) => {
+		if (e.target.closest(".uj1Jfd.wv9iH.iM6qI")) { // Escape button
+			return;
+		}
+		setTimeout(() => {
+			toUrlImages(1);
+		}, 500);
+	});
+
+	// for Mobile scrolling down
+	window.addEventListener('scroll', () => {
+		if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+			setTimeout(() => {
+				toUrlImages(1);
+			}, 100);
+		}
+	});
+
+	// for Desktop scrolling and observing
+	const observer = new MutationObserver(() => {
+		toUrlImages(1);
+	});
+	var searchBox = document.getElementById("search");
+	if(searchBox){
+		observer.observe(searchBox, {attributes:true, childList: true, subtree: true, attributeFilter: ['href']});
+	}
+
+	// for Mobile scrolling left and right
+	var startX = null;
+	document.addEventListener("touchstart", (event) => {
+			startX = event.touches[0].clientX;
+	});
+	document.addEventListener("touchend", (event) => {
+			var endX = event.changedTouches[0].clientX;
+			var diff = endX - startX;
+			if (Math.abs(diff) > 30) {
+				setTimeout(() => {
+					toUrlImages(1);
+				}, 500);
+			}
+	});
+})();

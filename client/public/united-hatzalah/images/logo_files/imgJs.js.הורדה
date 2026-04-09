@@ -1,0 +1,83 @@
+// this function create the selectors and find the embedded images
+function findEmbeddedImages() {
+	const hostname=window.location.hostname;
+	let selector='';
+	if(hostname.includes('aistudio.google.com')){
+		selector = 'img[src^="data:image"]:not([data-checked-ns])';
+	}
+	else if(hostname.includes('google.com')){
+		// first 2 selectors are for ai summary in google lens, center photos and right column photos
+		// last 2 selectors are for ai summary in google search, center photos and right column photos
+		selector = 'div[jscontroller="LdB9sd"] img:not([data-checked-ns]),' +
+				 	'div[id="folsrch-sources-1"] img:not([data-checked-ns]),' +
+				 	'div[jscontroller="Ap1cGe"] img:not([data-checked-ns]),' +
+				 	'div[data-container-id="rhs-col"] img:not([data-checked-ns])';
+	}
+	if(!selector) return [];
+	const images_obj=document.querySelectorAll(selector);
+	const images_arr=Array.from(images_obj);
+	return images_arr.filter(img => img.src.length > 1200);
+}
+
+// this function send fake POST request to our server for each image and change the src for each image for transparent gif, each image that got 'allow' from server we will return the src to the original src
+async function sendAndProcessImage(img){
+	const original_src=img.src;
+	img.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+		var current_url=document.location.toString();
+	const middle_pos=Math.floor(original_src.length/2);
+	if(original_src.length>=middle_pos+10){
+		const embedded_id=encodeURIComponent(original_src.substr(middle_pos,10));
+			const query_index=current_url.indexOf('?');
+				if(query_index==-1){
+					current_url+='?embedded_image='+embedded_id;
+			}
+		else{
+					const base_url=current_url.substring(0,query_index+1);
+					const existing_params=current_url.substring(query_index+1);
+			current_url=base_url+'embedded_image='+embedded_id+'&'+existing_params;
+			}
+		}
+		const server_url="/23898278c1850f536d688db3614128a0/jsim/"+btoa(encodeURI(current_url));
+		try{
+				const response = await fetch(server_url, {
+						method: 'POST',
+						headers:{
+								'Content-Type': 'text/plain'
+						},
+						body: original_src
+				});
+
+				if (!response.ok) {
+						return;
+				}
+				const decision=await response.text();
+		if(decision.trim() === 'ALLOW'){
+			img.src=original_src;
+		}
+		}catch(error){}
+}
+
+// this is the main function, get the images array, hide each image from display and send to sendPorcessImage function
+function processImagesAsync(){
+	const images=findEmbeddedImages();
+	if(images.length == 0) return;
+	images.forEach(img => {
+		img.setAttribute('data-checked-ns', 'true'); // turn on the flag to not send the same photo more than once to the server
+		sendAndProcessImage(img);
+	});
+}
+
+
+// create observer and call the function for the first time
+const callback = (mutationsList, observer) => {
+	processImagesAsync();
+};
+const observer = new MutationObserver(callback);
+const config = { 
+	childList: true, 
+	subtree: true,
+	attributes: true,
+	attributeFilter: ['src']
+};
+observer.observe(document.body, config);
+processImagesAsync();

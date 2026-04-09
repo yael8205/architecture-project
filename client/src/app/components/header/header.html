@@ -1,0 +1,52 @@
+<header class="main-header shadow-2">
+  <div class="header-grid">
+    
+    <nav class="nav-side">
+      @for (item of navItems(); track item.label) {
+        <a [routerLink]="item.link" routerLinkActive="active-link" class="nav-link">
+          <i [class]="item.icon + ' text-xl'"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="logo-container">
+      <a [routerLink]="'/join/' + slug()">
+        <img [src]="logoPath()" class="org-logo" alt="Logo" />
+      </a>
+    </div>
+
+    <div class="actions-side">
+      @if (!isLoggedIn()) {
+        <button pButton label="התחברות" 
+                class="auth-fill-btn" 
+                [style.background-color]="currentOrg()?.accentColor"
+                [routerLink]="loginLink()">
+        </button>
+        
+        <button pButton label="הרשמה" 
+                class="auth-fill-btn" 
+                [style.background-color]="currentOrg()?.primaryColor"
+                [routerLink]="registerLink()">
+        </button>
+      } @else {
+        <button pButton label="התנתקות" 
+                icon="pi pi-sign-out" 
+                class="p-button-text logout-btn font-bold" 
+                (click)="logout()">
+        </button>
+      }
+
+      @if (isAdmin()) {
+        <div class="divider"></div>
+        <button pButton icon="pi pi-cog" 
+                class="p-button-rounded p-button-text text-xl admin-btn" 
+                [style.color]="currentOrg()?.primaryColor"
+                pTooltip="ניהול מערכת" 
+                [routerLink]="managerLink()">
+        </button>
+      }
+    </div>
+
+  </div>
+</header>

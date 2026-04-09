@@ -1,0 +1,102 @@
+<div class="dynamic-cart-sidebar" [style.background-color]="orgService.currentOrg()?.secondaryColor">
+  <div class="cart-welcome-header">
+    <h3 [style.color]="orgService.currentOrg()?.primaryColor"> סל השותפות שלי</h3>
+    <p>הזכויות שלך, השותפות שלנו, העתיד שלהם</p>
+  </div>
+
+  @if (isLoggedIn()) {
+    
+    <div class="cart-scroll-area" *ngIf="cartService.cart() as cart; else emptyTemplate">
+      <div *ngFor="let pkg of cart.packagesInShoppingCart" 
+           class="package-accordion"
+           [class.is-focused]="cartService.focusedPackageId() === pkg.id"
+           [style.border-color]="cartService.focusedPackageId() === pkg.id ? orgService.currentOrg()?.accentColor : '#e2e8f0'">
+        
+        <div class="pkg-header" (click)="togglePackage(pkg.id)">
+          <div class="pkg-main-info">
+            <span class="pkg-name" [style.color]="orgService.currentOrg()?.primaryColor">{{ pkg.packageName }}</span>
+            <span class="pkg-price">{{ pkg.packagePrice | currency:'ILS':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <div class="pkg-left-actions">
+            <div class="pkg-status-info" *ngIf="cartService.focusedPackageId() !== pkg.id">
+              <div class="mini-images-wrapper">
+                <img *ngFor="let giftInPkg of pkg.giftsInPackage | slice:0:3" 
+                     [src]="cartService.getGiftImagePath(giftInPkg.giftPictureUrl || '')" 
+                     class="micro-thumb">
+              </div>
+              <span class="more-gifts-tag" *ngIf="pkg.giftsInPackage.length > 3"
+                    [style.color]="orgService.currentOrg()?.accentColor"
+                    [style.background-color]="orgService.currentOrg()?.accentColor + '15'">
+                +{{ pkg.giftsInPackage.length - 3 }} מתנות נוספות
+              </span>
+
+              <span class="gift-count-simple" *ngIf="pkg.giftsInPackage.length > 0 && pkg.giftsInPackage.length <= 3">
+                {{ pkg.giftsInPackage.length }} מתנות
+              </span>
+              <i class="pi pi-chevron-down" style="font-size: 0.8rem; margin-right: 5px;"></i>
+            </div>
+
+            <button class="delete-btn" (click)="removeItem(pkg.id); $event.stopPropagation()" [style.color]="orgService.currentOrg()?.accentColor">
+              <i class="pi pi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="pkg-details" *ngIf="cartService.focusedPackageId() === pkg.id">
+          <div class="active-badge" 
+               [style.background-color]="orgService.currentOrg()?.accentColor" 
+               [style.color]="orgService.currentOrg()?.accentContrast">
+            חבילה זו בבחירה פעילה
+          </div>
+          
+          <div class="gifts-list">
+            <div *ngFor="let gift of pkg.giftsInPackage" class="gift-row-item">
+              <img [src]="cartService.getGiftImagePath(gift.giftPictureUrl || '')" 
+                   class="gift-list-thumb"
+                   onerror="this.src='assets/images/default-gift.png'">
+              
+              <div class="gift-info-text">
+                <span class="gift-item-name">{{ gift.giftName }}</span>
+                <span class="gift-item-qty">כמות: {{ gift.qty }}</span>
+              </div>
+
+              <button class="remove-gift-small" (click)="removeGiftFromPackage(gift.giftId); $event.stopPropagation()">
+                <i class="pi pi-times"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-footer-sticky" *ngIf="cartService.cart()">
+      <div class="total-summary">
+        <span class="total-label" [style.color]="orgService.currentOrg()?.primaryColor">סה"כ :</span>
+        <span class="total-amount" [style.color]="orgService.currentOrg()?.primaryColor">
+          {{ totalPrice() | currency:'ILS':'symbol':'1.0-0' }}
+        </span>
+      </div>
+      
+      <button class="pay-btn-premium" 
+              [style.background-color]="orgService.currentOrg()?.primaryColor"
+              [style.color]="orgService.currentOrg()?.accentContrast"
+              (click)="checkout()">
+        <i class="pi pi-lock"></i>
+        <span>לתשלום מאובטח</span>
+      </button>
+    </div>
+
+  } @else {
+<div class="empty-msg" 
+     style="padding-top: 50px;" 
+     [style.color]="orgService.currentOrg()?.primaryColor">
+     <i class="pi pi-user-lock" style="font-size: 2.5rem; display: block; margin-bottom: 15px; opacity: 0.5;"></i>
+      יש להתחבר כדי לצפות בסל הקניות
+    </div>
+  }
+
+  <ng-template #emptyTemplate>
+    <div class="empty-msg">הסל מחכה לתרומה שלך</div>
+  </ng-template>
+</div>

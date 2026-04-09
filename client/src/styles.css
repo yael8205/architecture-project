@@ -1,0 +1,42 @@
+/* השאירי את ה-Import של PrimeNG בראש הקובץ */
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+/* עיצוב משלים שלא שובר את הקיים */
+.gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+.gift-card-luxury {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.gift-card-luxury:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* התאמה לצבע הארגוני מהתמונה (עזר מציון) */
+.header-section h2 {
+    border-bottom: 3px solid #e30613; /* הפס האדום שרואים בתמונה */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+body, html {
+    margin: 0;
+    padding: 0;
+        overflow-x: hidden;
+
+}
+
+/* אם ה-router-outlet עטוף בדיב כלשהו */
+main {
+    padding-top: 0 !important;
+}

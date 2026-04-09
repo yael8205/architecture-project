@@ -1,0 +1,21 @@
+2026-02-12 00:54:36.771 +02:00 [INF] Starting Store API application
+2026-02-12 00:54:38.460 +02:00 [FTL] Application start-up failed
+System.AggregateException: Some services are not able to be constructed (Error while validating the service descriptor 'ServiceType: LotteryApi.Services.IOrganizationService Lifetime: Scoped ImplementationType: LotteryApi.Services.OrganizationService': Unable to resolve service for type 'LotteryApi.Repositories.IOrganizationRepository' while attempting to activate 'LotteryApi.Services.OrganizationService'.)
+ ---> System.InvalidOperationException: Error while validating the service descriptor 'ServiceType: LotteryApi.Services.IOrganizationService Lifetime: Scoped ImplementationType: LotteryApi.Services.OrganizationService': Unable to resolve service for type 'LotteryApi.Repositories.IOrganizationRepository' while attempting to activate 'LotteryApi.Services.OrganizationService'.
+ ---> System.InvalidOperationException: Unable to resolve service for type 'LotteryApi.Repositories.IOrganizationRepository' while attempting to activate 'LotteryApi.Services.OrganizationService'.
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateArgumentCallSites(ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain, ParameterInfo[] parameters, Boolean throwIfCallSiteNotFound)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateConstructorCallSite(ResultCache lifetime, ServiceIdentifier serviceIdentifier, Type implementationType, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.CreateExact(ServiceDescriptor descriptor, ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain, Int32 slot)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.TryCreateExact(ServiceDescriptor descriptor, ServiceIdentifier serviceIdentifier, CallSiteChain callSiteChain, Int32 slot)
+   at Microsoft.Extensions.DependencyInjection.ServiceLookup.CallSiteFactory.GetCallSite(ServiceDescriptor serviceDescriptor, CallSiteChain callSiteChain)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.ValidateService(ServiceDescriptor descriptor)
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider.ValidateService(ServiceDescriptor descriptor)
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider..ctor(ICollection`1 serviceDescriptors, ServiceProviderOptions options)
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.DependencyInjection.ServiceProvider..ctor(ICollection`1 serviceDescriptors, ServiceProviderOptions options)
+   at Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.BuildServiceProvider(IServiceCollection services, ServiceProviderOptions options)
+   at Microsoft.Extensions.Hosting.HostApplicationBuilder.Build()
+   at Microsoft.AspNetCore.Builder.WebApplicationBuilder.Build()
+   at Program.<Main>$(String[] args) in D:\Project-Api-Angular\LotteryApi\LotteryApi\Program.cs:line 130
+{"@t":"2026-02-11T22:56:06.8426145Z","@mt":"Starting Store API application"}

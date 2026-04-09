@@ -1,0 +1,24 @@
+<div class="manager-container">
+  <div class="manager-header">
+    <h1>לוח בקרת מנהל</h1>
+    <p>ברוך הבא! בחר את התחום שברצונך לנהל כעת.</p>
+  </div>
+
+  <div class="manager-grid">
+    @for (item of menuItems(); track item.title) {
+      <div class="admin-card" [routerLink]="item.link">
+        <div class="card-icon" [style.color]="currentOrg()?.primaryColor">
+          <i [class]="item.icon"></i>
+        </div>
+        <div class="card-content">
+          <h3>{{ item.title }}</h3>
+          <p>{{ item.description }}</p>
+        </div>
+        <div class="card-footer">
+          <span>כניסה לניהול</span>
+          <i class="pi pi-chevron-left"></i>
+        </div>
+      </div>
+    }
+  </div>
+</div>

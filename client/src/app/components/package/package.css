@@ -1,0 +1,115 @@
+:host {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+.package-card-glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    overflow: hidden;
+    text-align: center;
+    transition: transform 0.3s ease;
+
+}
+
+.package-card-glass:hover {
+    transform: translateY(-5px);
+}
+
+.pkg-header-subtle {
+    padding: 25px 15px;
+}
+
+.pkg-price-tag {
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.pkg-name-text {
+    margin: 5px 0 0 0;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.composition-grid {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.comp-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.comp-val {
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.comp-label {
+    font-size: 0.7rem;
+    color: #777;
+    font-weight: 500;
+}
+
+.comp-sep {
+    width: 1px;
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.clean-counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.circle-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    background: white;
+    color: #666;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.number-display {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #222;
+}
+
+.btn-action-minimal {
+    width: 100%;
+    background: #1e272e;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 5px;
+}
+.packages-container {
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+app-video {
+    display: block;
+    width: 100%; /* תופס בדיוק את רוחב הקומפוננטה */
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+

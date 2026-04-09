@@ -1,0 +1,49 @@
+<app-video></app-video>
+<div class="packages-container ">
+  <div class="grid justify-content-center">
+    @for (pkg of packages(); track pkg.id) {
+      <div class="col-12 md:col-6 lg:col-4 p-4">
+        
+        <div class="package-card-glass">
+          <div class="pkg-header-subtle" [style.background-color]="orgService.currentOrg()?.primaryColor + '15'">
+            <div class="pkg-price-tag" [style.color]="orgService.currentOrg()?.primaryColor">
+               ₪{{ pkg.price }}
+            </div>
+            <h2 class="pkg-name-text">{{ pkg.name }}</h2>
+          </div>
+
+          <div class="pkg-content p-4">
+            <div class="composition-grid">
+              <div class="comp-item">
+                <span class="comp-val">{{ pkg.qtyClassicCards || 0 }}</span>
+                <span class="comp-label">קלאסי</span>
+              </div>
+              <div class="comp-sep"></div>
+              <div class="comp-item">
+                <span class="comp-val">{{ pkg.qtySpecialCards || 0 }}</span>
+                <span class="comp-label">מיוחד</span>
+              </div>
+              <div class="comp-sep"></div>
+              <div class="comp-item">
+                <span class="comp-val">{{ pkg.qtyPrimumCards || 0 }}</span>
+                <span class="comp-label">פרימיום</span>
+              </div>
+            </div>
+
+            <div class="clean-counter my-4">
+              <button (click)="updateLocalCount(pkg.id, 1)" class="circle-btn">+</button>
+              <div class="number-display">{{ pkg.ticketCount || 1 }}</div>
+              <button (click)="updateLocalCount(pkg.id, -1)" class="circle-btn">-</button>
+            </div>
+
+            <button class="btn-action-minimal"
+                    (click)="createMultiplePackages(pkg.id, pkg.ticketCount || 1)">
+              הוספה לסל
+            </button>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+</div>

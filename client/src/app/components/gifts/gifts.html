@@ -1,0 +1,90 @@
+<h1 [style.color]="orgService.currentOrg()?.primaryColor">מתנות</h1>
+
+<div class="filters-section shadow-1" style="display: flex; gap: 20px; margin-bottom: 30px; padding: 15px; background: #fff; border-radius: 15px;">
+  <div class="filter-item">
+    <label style="font-weight: bold; margin-left: 10px;">קטגוריה:</label>
+    <p-select [options]="categories()" [(ngModel)]="selectedCategory" optionLabel="name" optionValue="id" (onChange)="loadGifts()" placeholder="הכל"></p-select>
+  </div>
+  <div class="filter-item">
+    <label style="font-weight: bold; margin-left: 10px;">סוג כרטיס:</label>
+    <p-select [options]="priceOptions" [(ngModel)]="selectedPriceType" optionLabel="name" optionValue="value" (onChange)="loadGifts()" placeholder="הכל"></p-select>
+  </div>
+</div>
+<div class="gifts-grid">
+  @for (gift of gifts(); track gift.id) {
+    <div class="gift-card-luxury" [class.gift-is-drawn]="gift.isDrawn">
+      
+      <div class="price-tag-dynamic" [style.background-color]="gift.isDrawn ? '#64748b' : orgService.currentOrg()?.primaryColor">
+        {{ gift.cardPrice }} 
+      </div>
+
+      <div class="image-wrapper">
+        <img [src]="cartService.getGiftImagePath(gift.pictureUrl || '')" 
+             class="gift-image-main" 
+             [alt]="gift.name"
+             [style.filter]="gift.isDrawn ? 'grayscale(100%)' : 'none'">
+        
+        @if (gift.isDrawn) {
+          <div class="drawn-overlay-label">
+            <i class="pi pi-check-circle"></i> הוגרל
+          </div>
+        }
+        <div class="image-overlay"></div>
+      </div>
+
+      <div class="gift-content">
+        <div class="top-info">
+          <span class="category-label" 
+                [style.background-color]="orgService.currentOrg()?.accentColor + '15'" 
+                [style.color]="orgService.currentOrg()?.accentColor">
+            {{ gift.categoryName }}
+          </span>
+          <h3 class="gift-name-premium">{{ gift.name }}</h3>
+          
+          @if (gift.isDrawn && gift.gifPurchased) {
+             <div class="winner-announcement">
+                @for (p of gift.gifPurchased; track p.id) {
+                   @if (p.isWinner) {
+                      <small class="winner-name">זוכה: {{ p.participantName }}</small>
+                   }
+                }
+             </div>
+          }
+        </div>
+        
+        <div class="action-section">
+          <div class="quantity-control-minimal" *ngIf="cartService.focusedPackageId() && canAddGift(gift) && !gift.isDrawn">
+            <button (click)="updateLocalCount(gift.id, -1)" class="q-btn" [style.color]="orgService.currentOrg()?.primaryColor">-</button>
+            <span class="q-amount">{{ gift.ticketCount || 1 }}</span>
+            <button (click)="updateLocalCount(gift.id, 1)" class="q-btn" [style.color]="orgService.currentOrg()?.primaryColor">+</button>
+          </div>
+<button class="btn-main-action"
+        [disabled]="isGiftDrawn(gift) || !canAddGift(gift)"
+        (click)="handleAddToPackage(gift)"
+        [style.background-color]="isGiftDrawn(gift) ? '#64748b' : (canAddGift(gift) ? orgService.currentOrg()?.primaryColor : '#e2e8f0')"
+        [ngClass]="{'btn-locked': isGiftDrawn(gift) || !canAddGift(gift)}">
+
+  <i class="pi" [ngClass]="isGiftDrawn(gift) ? 'pi-lock' : (canAddGift(gift) ? 'pi-plus-circle' : 'pi-exclamation-triangle')"></i>
+  
+  <span class="btn-text">
+    @if (isGiftDrawn(gift)) {
+        ההגרלה כבר בוצעה
+    } 
+    @else if (!cartService.focusedPackageId()) {
+        בחר חבילה
+    } 
+    @else if (canAddGift(gift)) {
+        הוספה לחבילה
+    } 
+    @else {
+        המכסה מלאה
+    }
+  </span>
+</button>
+        </div>
+      </div>
+
+      <div class="bottom-accent-line" [style.background-color]="gift.isDrawn ? '#64748b' : orgService.currentOrg()?.accentColor"></div>
+    </div>
+  }
+</div>

@@ -1,0 +1,78 @@
+:host {
+    display: block;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.register-container {
+    direction: rtl;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    background: radial-gradient(circle at center, var(--secondary-color) 0%, #cbd5e1 100%);
+    box-sizing: border-box; 
+    padding: 10px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 360px; 
+    border-radius: 12px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    border: none !important;
+    border-top: 5px solid var(--accent-color) !important;
+    background: #ffffff;
+}
+
+:host ::ng-deep .p-card-body {
+    padding: 0.6rem 0.8rem !important;
+}
+
+
+h2 {
+    color: var(--primary-color) !important;
+    font-size: 1.8rem !important;
+    margin: 0 0 0.3rem 0 !important;
+    font-weight: 800 !important;
+}
+
+.text-gray-500 {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+
+.field {
+    margin-bottom: 0.6rem !important; 
+}
+
+:host ::ng-deep .p-inputtext {
+    padding: 0.5rem 0.6rem !important; 
+    font-size: 0.85rem !important;
+}
+
+:host ::ng-deep .p-password input {
+    padding: 0.5rem 0.6rem !important;
+}
+
+
+.luxury-button {
+    background-color: var(--primary-color) !important;
+    color: var(--accent-contrast) !important; 
+    font-weight: 700 !important;
+    padding: 0.6rem !important; 
+    font-size: 0.95rem !important;
+    border-radius: 6px !important;
+    margin-top: 0.4rem !important;
+    opacity: 1 !important;
+}
+
+
+small.text-red-400 {
+    font-size: 0.65rem !important;
+    line-height: 1;
+    display: block;
+    margin-top: 1px;
+}

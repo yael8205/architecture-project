@@ -33,14 +33,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(category);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<CategoryDto>> CreateCategoryAsync([FromBody] CategoryCreateDto category)
         {
             var newCategory=await _categoryService.CreateCategoryAsync(category);
             return Ok(newCategory);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryDto>> UpdateCategoryAsync(int id, [FromBody] CategoryUpdateDto category)
         {
@@ -51,7 +51,7 @@ namespace LotteryApi.Controllers
             }
             return Ok(updateCategory);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategoryAsync(int id)
         {

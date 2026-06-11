@@ -26,7 +26,7 @@ namespace LotteryApi.Services
         }
         public async Task<DonorDto?> GetDonorsByIdAsync(int id)
         {
-            var donor = await _donorRepository.GetDonorsByIdAsync(id);
+            var donor = await _donorRepository.GetDonorsByIdAsync(id.ToString());
             return donor != null ? new DonorDto { Id = donor.Id, Name = donor.Name, Email = donor.Email, Phone = donor.Phone, GiftNames = donor.Gifts.Select(g => g.Name).ToList() } : null;
         }
 
@@ -45,7 +45,7 @@ namespace LotteryApi.Services
 
         public async Task<DonorDto?> UpdateDonorsAsync(int id, DonorUpdateDto updateDonor)
         {
-            var existing = await _donorRepository.GetDonorsByIdAsync(id);
+            var existing = await _donorRepository.GetDonorsByIdAsync(id.ToString());
             if (existing == null)
             {
                 return null;
@@ -59,7 +59,7 @@ namespace LotteryApi.Services
         }
         public async Task<bool> DeleteDonorsAsync(int id)
         {
-            return await _donorRepository.DeleteDonorsAsync(id);
+            return await _donorRepository.DeleteDonorsAsync(id.ToString());
         }
         public async Task<IEnumerable<DonorDto>> GetFilteredDonorsAsync(string? name, string? email, string? giftName)
         {

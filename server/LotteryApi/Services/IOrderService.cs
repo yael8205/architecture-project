@@ -5,7 +5,7 @@ namespace LotteryApi.Services
     public interface IOrderService
     {
         Task<OrderDto> CreateShoppingCartAsync(ShoppingCartDto shoppingcart);
-        Task<OrderDto?> GetOrderByIdAsync(int id);
+        Task<OrderDto?> GetOrderByIdAsync(string id);
         Task<IEnumerable<OrderDto>> GetOrdersAsync();
     }
 }

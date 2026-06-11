@@ -1,133 +1,83 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Enums;
+﻿using LotteryApi.Enums;
 using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using System.Linq;
 
 namespace LotteryApi.Repositories
 {
     public class GiftRepoditory : IGiftRepoditory
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public GiftRepoditory(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<GiftModel> _gifts;
+
+        public GiftRepoditory(IMongoCollection<GiftModel> gifts)
         {
-            _lotteryContext = lotteryDbContext;
+            _gifts = gifts;
         }
+
         public async Task<IEnumerable<GiftModel>> GetGiftsAsync()
         {
-            return await _lotteryContext.Gifts
-                .Include(c => c.Category)
-                .Include(d => d.Donor)
-                .Include(g => g.GifPurchased)
-                .ThenInclude(p=>p.PackageInOrder)
-                  .ThenInclude(o => o.Order)
-                    .ThenInclude(u => u.Participant)
-                .ToListAsync();
+            return await _gifts.Find(_ => true).ToListAsync();
         }
-        public async Task<GiftModel?> GetGiftByIdAsync(int id)
+
+        public async Task<GiftModel?> GetGiftByIdAsync(string id)
         {
-            return await _lotteryContext.Gifts
-                .Include(c => c.Category)
-                .Include(d => d.Donor)
-                 .Include(g => g.GifPurchased)
-                 .ThenInclude(p => p.PackageInOrder)
-                  .ThenInclude(o => o.Order)
-                    .ThenInclude(u => u.Participant)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _gifts.Find(g => g.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<GiftModel> CreateGiftAsync(GiftModel gift)
         {
-            _lotteryContext.Gifts.Add(gift);
-            await _lotteryContext.SaveChangesAsync();
+            await _gifts.InsertOneAsync(gift);
             return gift;
         }
+
         public async Task<GiftModel?> UpdateGiftAsync(GiftModel gift)
         {
-            var existing = await _lotteryContext.Gifts.FindAsync(gift.Id);
-            if (existing == null)
-                return null;
-            _lotteryContext.Entry(existing).CurrentValues.SetValues(gift);
-            await _lotteryContext.SaveChangesAsync();
-            return existing;
+            var result = await _gifts.ReplaceOneAsync(g => g.Id == gift.Id, gift);
+            return result.MatchedCount == 0 ? null : gift;
+        }
 
-        }
-        public async Task<bool> DeleteGiftAsync(int id)
+        public async Task<bool> DeleteGiftAsync(string id)
         {
-            var existing = await _lotteryContext.Gifts.FindAsync(id);
-            if (existing == null)
-                return false;
-            _lotteryContext.Gifts.Remove(existing);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
+            var result = await _gifts.DeleteOneAsync(g => g.Id == id);
+            return result.DeletedCount > 0;
         }
+
         public async Task<IEnumerable<GiftModel>> SearchGiftsAsync(string? giftName, string? donorName, int? minPurchasers)
         {
-            var query = _lotteryContext.Gifts
-                .Include(c => c.Category)
-                .Include(d => d.Donor)
-                .Include(g => g.GifPurchased)
-                .ThenInclude(gp => gp.PackageInOrder)
-                    .ThenInclude(go => go.Order)
-                .AsQueryable();
+            var filter = Builders<GiftModel>.Filter.Empty;
 
             if (!string.IsNullOrEmpty(giftName))
-            {
-                query = query.Where(g => g.Name.Contains(giftName));
-            }
+                filter &= Builders<GiftModel>.Filter.Regex(g => g.Name, new MongoDB.Bson.BsonRegularExpression(giftName, "i"));
 
             if (!string.IsNullOrEmpty(donorName))
-            {
-                query = query.Where(g => g.Donor != null && g.Donor.Name.Contains(donorName));
-            }
+                filter &= Builders<GiftModel>.Filter.Regex("Donor.Name", new MongoDB.Bson.BsonRegularExpression(donorName, "i"));
 
             if (minPurchasers.HasValue)
-            {
-                query = query.Where(g => g.GifPurchased.Count >= minPurchasers.Value);
-            }
+                filter &= Builders<GiftModel>.Filter.SizeGte(g => g.GifPurchased, minPurchasers.Value);
 
-            return await query.ToListAsync();
+            return await _gifts.Find(filter).ToListAsync();
         }
+
         public async Task<IEnumerable<GiftModel>> FilterGiftsAsync(int? categoryId, CardPriceEnum? priceType)
         {
-            var query = _lotteryContext.Gifts
-                .Include(g => g.Category)
-                .Include(g => g.Donor)
-                .Include(g => g.GifPurchased)
-                .ThenInclude(gp => gp.PackageInOrder)
-                    .ThenInclude(gp => gp.Order)
-                    .ThenInclude(o => o.Participant)
-                .AsQueryable();
+            var filter = Builders<GiftModel>.Filter.Empty;
 
             if (categoryId.HasValue && categoryId > 0)
-                query = query.Where(g => g.CategoryId == categoryId.Value);
+                filter &= Builders<GiftModel>.Filter.Eq(g => g.CategoryId, categoryId.Value.ToString());
 
             if (priceType.HasValue)
-                query = query.Where(g => g.CardPrice == priceType.Value);
+                filter &= Builders<GiftModel>.Filter.Eq(g => g.CardPrice, priceType.Value);
 
-            return await query.ToListAsync();
+            return await _gifts.Find(filter).ToListAsync();
         }
+
         public async Task<IEnumerable<GiftModel>> SortedGiftsExpensiveAsync(string sortBy)
         {
-            var query = _lotteryContext.Gifts
-                .Include(g => g.Category)
-                .Include(g => g.Donor)
-                .Include(g => g.GifPurchased)
-                 .ThenInclude(gp => gp.PackageInOrder)
-                    .ThenInclude(gp => gp.Order)
-                    .ThenInclude(o => o.Participant)
-                .AsQueryable();
+            var sortDefinition = sortBy == "price"
+                ? Builders<GiftModel>.Sort.Descending(g => g.CardPrice)
+                : Builders<GiftModel>.Sort.Descending(g => g.GifPurchased.Count);
 
-            if (sortBy == "price")
-            {
-                query = query.OrderByDescending(g => g.CardPrice);
-            }
-            else if (sortBy == "popular")
-            {
-
-                query = query.OrderByDescending(g => g.GifPurchased.Count);
-            }
-
-            return await query.ToListAsync();
+            return await _gifts.Find(_ => true).Sort(sortDefinition).ToListAsync();
         }
-
     }
 }

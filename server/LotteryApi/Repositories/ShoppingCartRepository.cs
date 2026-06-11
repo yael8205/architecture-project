@@ -1,82 +1,58 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Dtos;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class ShoppingCartRepository : IShoppingCartRepository
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public ShoppingCartRepository(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<ShoppingCartModel> _shoppingCarts;
+        private readonly IMongoCollection<PackageInCartModel> _packagesInCart;
+
+        public ShoppingCartRepository(
+            IMongoCollection<ShoppingCartModel> shoppingCarts,
+            IMongoCollection<PackageInCartModel> packagesInCart)
         {
-            _lotteryContext = lotteryDbContext;
+            _shoppingCarts = shoppingCarts;
+            _packagesInCart = packagesInCart;
         }
 
+        public async Task<ShoppingCartModel?> GetShoppingCartByIdAsync(string id)
+        {
+            return await _shoppingCarts.Find(c => c.Id == id).FirstOrDefaultAsync();
+        }
 
-        public async Task<ShoppingCartModel?> GetShoppingCartByIdAsync(int id)
+        public async Task<ShoppingCartModel?> GetShoppingCartByUserIdAsync(string participantId)
         {
-            return await _lotteryContext.ShoppingCarts
-               .Include(p => p.Participant)
-               .Include(pa => pa.PackagesInShoppingCart)
-                     .ThenInclude(p => p.Package)
-               .Include(pa => pa.PackagesInShoppingCart)
-                .ThenInclude(g => g.GiftsInPackage)
-                  .ThenInclude(g => g.Gift)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _shoppingCarts.Find(c => c.ParticipantId == participantId).FirstOrDefaultAsync();
         }
-        public async Task<ShoppingCartModel?> GetShoppingCartByUserIdAsync(int ParticipantId)
-        {
-            return await _lotteryContext.ShoppingCarts
-               .Include(p => p.Participant)
-               .Include(pa => pa.PackagesInShoppingCart)
-                     .ThenInclude(p => p.Package)
-               .Include(pa => pa.PackagesInShoppingCart)
-                .ThenInclude(g => g.GiftsInPackage)
-                  .ThenInclude(g => g.Gift)
-                .FirstOrDefaultAsync(c => c.ParticipantId == ParticipantId);
-        }
+
         public async Task<ShoppingCartModel> CreateShoppingCartAsync(ShoppingCartModel shoppingCart)
         {
-            _lotteryContext.ShoppingCarts.Add(shoppingCart);
-            await _lotteryContext.SaveChangesAsync();
+            await _shoppingCarts.InsertOneAsync(shoppingCart);
             return shoppingCart;
         }
 
         public async Task<ShoppingCartModel?> UpdateShoppingCartAsync(ShoppingCartModel shoppingCart)
         {
-            var existing = await _lotteryContext.ShoppingCarts.FindAsync(shoppingCart.Id);
-            if (existing == null)
-                return null;
-            _lotteryContext.Entry(existing).CurrentValues.SetValues(shoppingCart);
-            await _lotteryContext.SaveChangesAsync();
-            return existing;
-        }
-        public async Task<bool> DeleteShoppingCartAsync(int id)
-        {
-            var existing = await _lotteryContext.ShoppingCarts.FindAsync(id);
-            if (existing == null)
-                return false;
-            _lotteryContext.ShoppingCarts.Remove(existing);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
-
+            var result = await _shoppingCarts.ReplaceOneAsync(c => c.Id == shoppingCart.Id, shoppingCart);
+            return result.MatchedCount == 0 ? null : shoppingCart;
         }
 
-
-        public async Task<bool> EmptyCartAsync(int cartId)
+        public async Task<bool> DeleteShoppingCartAsync(string id)
         {
-            var cart = await _lotteryContext.ShoppingCarts
-                .Include(c => c.PackagesInShoppingCart)
-                  .ThenInclude(p => p.GiftsInPackage)
-                .FirstOrDefaultAsync(c => c.Id == cartId);
+            var result = await _shoppingCarts.DeleteOneAsync(c => c.Id == id);
+            return result.DeletedCount > 0;
+        }
 
+        public async Task<bool> EmptyCartAsync(string cartId)
+        {
+            var cart = await _shoppingCarts.Find(c => c.Id == cartId).FirstOrDefaultAsync();
             if (cart == null)
                 return false;
 
-            _lotteryContext.PackagesInCart.RemoveRange(cart.PackagesInShoppingCart);
+            await _packagesInCart.DeleteManyAsync(p => p.CartId == cart.Id);
             cart.SumPrice = 0;
-            await _lotteryContext.SaveChangesAsync();
+            await _shoppingCarts.ReplaceOneAsync(c => c.Id == cart.Id, cart);
             return true;
         }
     }

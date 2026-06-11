@@ -23,13 +23,8 @@ export class ShoppingCartService {
 public cart = signal<ShoppingCartDto | null>(null);
 public focusedPackageId = signal<number | null>(null);
 
-  private getHeaders() {
-    const token = localStorage.getItem('token');
-    return { 'Authorization': `Bearer ${token}` };
-  }
 createCart(userData:ShoppingCartCreate ): Observable<any> {
-  
-  return this.http.post(`${this.apiUrl}`, userData, { headers: this.getHeaders() });
+  return this.http.post(`${this.apiUrl}`, userData);
 }
 getGiftImagePath(pictureUrl: string | null | undefined): string {
   const slug = this.orgService.currentOrg()?.slug || 'ezer-mizion';
@@ -39,11 +34,11 @@ getGiftImagePath(pictureUrl: string | null | undefined): string {
  const userJson = localStorage.getItem('user');
 const userObj = userJson ? JSON.parse(userJson) : null;
 const id = userObj ? userObj.id : 0;
-    return this.http.get<ShoppingCartDto>(`${this.apiUrl}/user/${id}`, { headers: this.getHeaders()});
+    return this.http.get<ShoppingCartDto>(`${this.apiUrl}/user/${id}`);
 
   }
    deletePackageFromCart(packageId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl2}/${packageId}`, { headers: this.getHeaders() });
+    return this.http.delete<void>(`${this.apiUrl2}/${packageId}`);
   }
   // פונקציה חדשה להוספת מתנה לחבילה
  addGiftToPackage(giftId: number, packageInCartId: number, qty: number): Observable<any> {
@@ -56,7 +51,7 @@ const id = userObj ? userObj.id : 0;
   
 
 
-  return this.http.post(`${this.apiUrl3}`, payload, { headers: this.getHeaders() })
+  return this.http.post(`${this.apiUrl3}`, payload)
     .pipe(
       // רק אחרי שה-POST מצליח, אנחנו מבצעים רענון
       tap((response) => {
@@ -116,7 +111,7 @@ public refreshCartData() {
       console.error('אין סל קניות פעיל לביצוע תשלום');
       return new Observable(observer => observer.error('אין סל קניות פעיל'));
     }
-    return this.http.post(`${this.apiUrl4}`, currentCart, { headers: this.getHeaders() });
+    return this.http.post(`${this.apiUrl4}`, currentCart);
   }
 
 

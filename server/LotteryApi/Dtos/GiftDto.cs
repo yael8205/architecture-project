@@ -7,15 +7,15 @@ namespace LotteryApi.Dtos
 {
     public class GiftDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = null!;
         public string Name { get; set; }
         public string? Description { get; set; }
-        public int CategoryId { get; set; }
+        public string CategoryId { get; set; } = null!;
        public string CategoryName { get; set; }
         public int PrizeQuantity { get; set; } = 1;
         public string CardPrice { get; set; }
         public string? PictureUrl { get; set; }
-        public int DonorId { get; set; }
+        public string DonorId { get; set; } = null!;
         public string DonorName { get; set; }
         public ICollection<GiftPurchaserDto> GifPurchased { get; set; } = new List<GiftPurchaserDto>();
 
@@ -28,24 +28,24 @@ namespace LotteryApi.Dtos
         public string Name { get; set; }
         public string? Description { get; set; }
         [Required]
-        public int CategoryId { get; set; }
+        public string CategoryId { get; set; } = null!;
         public int PrizeQuantity { get; set; } = 1;
         [Required]
         public CardPriceEnum CardPrice { get; set; }
         public string? PictureUrl { get; set; }
         [Required]
-        public int DonorId { get; set; }
+        public string DonorId { get; set; } = null!;
        
     }
     public class GiftUpdateDto
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public int? CategoryId { get; set; }
+        public string? CategoryId { get; set; }
         public int? PrizeQuantity { get; set; }
         public CardPriceEnum? CardPrice { get; set; }
         public string? PictureUrl { get; set; }
-        public int? DonorId { get; set; }
+        public string? DonorId { get; set; }
        
     }
 

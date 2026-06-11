@@ -22,3 +22,7 @@ dist/
 # Secrets and environment files
 .env
 .env.local
+server/LotteryApi/appsettings.json
+
+# Logs
+server/LotteryApi/Logs/

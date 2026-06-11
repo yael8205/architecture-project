@@ -4,6 +4,6 @@ namespace LotteryApi.Repositories
 {
     public interface IGiftInOrderRepositorycs
     {
-        Task<GiftInOrderModel?> GetGiftInOrderByIdAsync(int id);
+        Task<GiftInOrderModel?> GetGiftInOrderByIdAsync(string id);
     }
 }

@@ -25,7 +25,7 @@ namespace LotteryApi.Services
 
         public async Task<PackageInCartDto?> GetPackageInCartByIdAsync(int id)
         {
-            var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id);
+            var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id.ToString());
 
             return packageInCart != null ? new PackageInCartDto
             {
@@ -56,7 +56,7 @@ namespace LotteryApi.Services
             {
                 return null;
             }
-            var cart = await _ShoppingCartRepository.GetShoppingCartByUserIdAsync(userId);
+            var cart = await _ShoppingCartRepository.GetShoppingCartByUserIdAsync(userId.ToString());
             if (cart == null)
                 throw new NotFoundException("סל הקניות של המשתמש לא נמצא.");
             var package = await _packageRepository.GetPackageByIdAsync(packageInCart.PackageId);
@@ -98,7 +98,7 @@ namespace LotteryApi.Services
         public async Task<bool> DeletePackageInCartAsync(int id)
         {
 
-            var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id);
+            var packageInCart = await _packageInCartRepository.GetPackageInCartByIdAsync(id.ToString());
             if (packageInCart == null)
                 return false;
             var userIdCalm = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -106,7 +106,7 @@ namespace LotteryApi.Services
             {
                 return false;
             }
-            var cart = await _ShoppingCartRepository.GetShoppingCartByUserIdAsync(userId);
+            var cart = await _ShoppingCartRepository.GetShoppingCartByUserIdAsync(userId.ToString());
             if (cart == null)
                 return false;
             if (cart.Id != packageInCart.CartId)
@@ -118,7 +118,7 @@ namespace LotteryApi.Services
             await _ShoppingCartRepository.UpdateShoppingCartAsync(cart);
 
 
-            return await _packageInCartRepository.DeletePackageInCartAsync(id);
+            return await _packageInCartRepository.DeletePackageInCartAsync(id.ToString());
 
 
         }

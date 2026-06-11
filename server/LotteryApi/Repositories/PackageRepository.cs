@@ -1,52 +1,44 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class PackageRepository : IPackageRepository
     {
+        private readonly IMongoCollection<PackageModel> _packages;
 
-        private readonly LotteryDbContext _lotteryContext;
-        public PackageRepository(LotteryDbContext lotteryDbContext)
+        public PackageRepository(IMongoCollection<PackageModel> packages)
         {
-            _lotteryContext = lotteryDbContext;
+            _packages = packages;
         }
+
         public async Task<IEnumerable<PackageModel>> GetPackageAsync()
         {
-            return await _lotteryContext.Packages.ToListAsync();
+            return await _packages.Find(_ => true).ToListAsync();
         }
-        public async Task<PackageModel?> GetPackageByIdAsync(int id)
+
+        public async Task<PackageModel?> GetPackageByIdAsync(string id)
         {
-            return await _lotteryContext.Packages
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _packages.Find(p => p.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<PackageModel> CreatePackageAsync(PackageModel package)
         {
-            _lotteryContext.Packages.Add(package);
-            await _lotteryContext.SaveChangesAsync();
+            await _packages.InsertOneAsync(package);
             return package;
         }
+
         public async Task<PackageModel?> UpdatePackageAsync(PackageModel package)
         {
-            var existing = await _lotteryContext.Packages.FindAsync(package.Id);
-            if (existing == null)
-                return null;
-            _lotteryContext.Entry(existing).CurrentValues.SetValues(package);
-            await _lotteryContext.SaveChangesAsync();
-            return existing;
-
+            var result = await _packages.ReplaceOneAsync(p => p.Id == package.Id, package);
+            return result.MatchedCount == 0 ? null : package;
         }
-        public async Task<bool> DeletePackageAsync(int id)
+
+        public async Task<bool> DeletePackageAsync(string id)
         {
-            var existing = await _lotteryContext.Packages.FindAsync(id);
-            if (existing == null)
-                return false;
-            _lotteryContext.Packages.Remove(existing);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
+            var result = await _packages.DeleteOneAsync(p => p.Id == id);
+            return result.DeletedCount > 0;
         }
-
     }
 }
 

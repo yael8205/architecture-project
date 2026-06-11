@@ -1,40 +1,32 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class PackageInCartRepository : IPackageInCartRepository
     {
-        private readonly LotteryDbContext _lotteryContext ;
+        private readonly IMongoCollection<PackageInCartModel> _packagesInCart;
 
-        public PackageInCartRepository(LotteryDbContext lotteryDbContext)
+        public PackageInCartRepository(IMongoCollection<PackageInCartModel> packagesInCart)
         {
-            _lotteryContext = lotteryDbContext;
+            _packagesInCart = packagesInCart;
         }
 
-        public async Task<PackageInCartModel?> GetPackageInCartByIdAsync(int id)
+        public async Task<PackageInCartModel?> GetPackageInCartByIdAsync(string id)
         {
-            return await _lotteryContext.PackagesInCart
-                .Include(p => p.Package)
-                .Include(p => p.GiftsInPackage)
-                 .ThenInclude(g => g.Gift)
-               .FirstOrDefaultAsync(p => p.Id == id);
+            return await _packagesInCart.Find(p => p.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<PackageInCartModel> CreatePackageInCartAsync(PackageInCartModel packageInCart)
         {
-            _lotteryContext.PackagesInCart.Add(packageInCart);
-            await _lotteryContext.SaveChangesAsync();
+            await _packagesInCart.InsertOneAsync(packageInCart);
             return packageInCart;
         }
-        public async Task<bool> DeletePackageInCartAsync(int id)
+
+        public async Task<bool> DeletePackageInCartAsync(string id)
         {
-            var existing = await _lotteryContext.PackagesInCart.FindAsync(id);
-            if (existing == null)
-                return false;
-            _lotteryContext.PackagesInCart.Remove(existing);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
+            var result = await _packagesInCart.DeleteOneAsync(p => p.Id == id);
+            return result.DeletedCount > 0;
         }
     }
 }

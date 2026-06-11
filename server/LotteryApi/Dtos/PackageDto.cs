@@ -4,7 +4,7 @@ namespace LotteryApi.Dtos
 {
     public class PackageDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
       
         public string Name { get; set; }
       

@@ -16,7 +16,7 @@ namespace LotteryApi.Controllers
         {
             _orderService = orderService;
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDto>>> GetOrdersAsync()
         {
@@ -25,7 +25,7 @@ namespace LotteryApi.Controllers
         }
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> GetOrderByIdAsync(int id)
+        public async Task<ActionResult<OrderDto>> GetOrderByIdAsync(string id)
         {
             var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null)

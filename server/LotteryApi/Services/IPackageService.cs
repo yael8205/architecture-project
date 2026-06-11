@@ -5,9 +5,9 @@ namespace LotteryApi.Services
     public interface IPackageService
     {
         Task<PackageDto> CreatePackageAsync(PackageCreateDto package);
-        Task<bool> DeletePackageAsync(int id);
+        Task<bool> DeletePackageAsync(string id);
         Task<IEnumerable<PackageDto>> GetPackageAsync();
-        Task<PackageDto?> GetPackageByIdAsync(int id);
-        Task<PackageDto?> UpdatePackageAsync(int id, PackageUpdateDto updatePackage);
+        Task<PackageDto?> GetPackageByIdAsync(string id);
+        Task<PackageDto?> UpdatePackageAsync(string id, PackageUpdateDto updatePackage);
     }
 }

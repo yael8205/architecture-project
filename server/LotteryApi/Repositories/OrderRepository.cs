@@ -1,41 +1,30 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public OrderRepository(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<OrderModel> _orders;
+
+        public OrderRepository(IMongoCollection<OrderModel> orders)
         {
-            _lotteryContext = lotteryDbContext;
+            _orders = orders;
         }
 
         public async Task<IEnumerable<OrderModel>> GetOrdersAsync()
         {
-            return await _lotteryContext.Orders
-                .Include(p => p.PackagesInOrder)
-                  .ThenInclude(p => p.Package)
-                .Include(p => p.PackagesInOrder)
-                 .ThenInclude(g => g.GiftsInPackage)
-                   .ThenInclude(g => g.Gift)
-                .ToListAsync();
+            return await _orders.Find(_ => true).ToListAsync();
         }
-        public async Task<OrderModel?> GetOrderByIdAsync(int id)
+
+        public async Task<OrderModel?> GetOrderByIdAsync(string id)
         {
-            return await _lotteryContext.Orders
-               .Include(p => p.PackagesInOrder)
-                  .ThenInclude(p => p.Package)
-                .Include(p => p.PackagesInOrder)
-                 .ThenInclude(g => g.GiftsInPackage)
-                   .ThenInclude(g => g.Gift)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _orders.Find(o => o.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<OrderModel> CreateOrderAsync(OrderModel order)
         {
-            _lotteryContext.Orders.Add(order);
-            await _lotteryContext.SaveChangesAsync();
+            await _orders.InsertOneAsync(order);
             return order;
         }
     }

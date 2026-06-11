@@ -5,10 +5,10 @@ namespace LotteryApi.Repositories
     public interface IShoppingCartRepository
     {
         Task<ShoppingCartModel> CreateShoppingCartAsync(ShoppingCartModel shoppingCart);
-        Task<bool> DeleteShoppingCartAsync(int id);
-        Task<bool> EmptyCartAsync(int cartId);
-        Task<ShoppingCartModel?> GetShoppingCartByIdAsync(int id);
-        Task<ShoppingCartModel?> GetShoppingCartByUserIdAsync(int ParticipantId);
+        Task<bool> DeleteShoppingCartAsync(string id);
+        Task<bool> EmptyCartAsync(string cartId);
+        Task<ShoppingCartModel?> GetShoppingCartByIdAsync(string id);
+        Task<ShoppingCartModel?> GetShoppingCartByUserIdAsync(string participantId);
         Task<ShoppingCartModel?> UpdateShoppingCartAsync(ShoppingCartModel shoppingCart);
     }
 }

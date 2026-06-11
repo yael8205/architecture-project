@@ -71,13 +71,14 @@ private router = inject(Router);
     switchMap(() => this.authService.login({ email: this.user.email, password: this.user.password })),
 
     switchMap((loginResponse) => {
-  if (loginResponse.token) {
-        localStorage.setItem('token', loginResponse.token);
+      if (loginResponse.user) {
+        localStorage.setItem('user', JSON.stringify(loginResponse.user));
+        localStorage.removeItem('token');
       }
 
-      const newUserId = loginResponse.id || loginResponse.user?.id;
-      
-      return this.cartService.createCart({ participantId: newUserId }); 
+      const newUserId = loginResponse.user?.id;
+
+      return this.cartService.createCart({ participantId: newUserId });
     })).subscribe({
       next: (response) => {
         this.isLoading = false;

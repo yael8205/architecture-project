@@ -1,1 +1,0 @@
-2026-02-11 12:04:39.363 +02:00 [INF] Starting Store API application

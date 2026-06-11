@@ -18,27 +18,24 @@ private orgService = inject(OrgService);
     getGifts() :Observable<GiftDto[]> {
     return this.http.get<GiftDto[]>(this.apiUrl);
   }
-   private getHeaders() {
-    const token = localStorage.getItem('token');
-    return { 'Authorization': `Bearer ${token}` };
-  }
- 
+
   getGiftById(id: number): Observable<GiftDto> {
     return this.http.get<GiftDto>(`${this.apiUrl}/${id}`);
   }
+
  createGift(gift: GiftCreateDto): Observable<GiftDto> {
-    return this.http.post<GiftDto>(this.apiUrl, gift, { headers: this.getHeaders() });
+    return this.http.post<GiftDto>(this.apiUrl, gift);
   }
   updateGift(id: number, gift: GiftUpdateDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, gift, { headers: this.getHeaders() });
+    return this.http.put<void>(`${this.apiUrl}/${id}`, gift);
   }
 
   // 5. מחיקת מתנה (DELETE)
   deleteGift(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
   RunLottery(giftId: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/run/${giftId}`, { giftId}, { headers: this.getHeaders() });
+    return this.http.post(`${this.apiUrl}/run/${giftId}`, { giftId});
   }
 getFilteredGifts(categoryId: number | null, priceType: number | null): Observable<GiftDto[]> {
   let params = new HttpParams();
@@ -68,7 +65,7 @@ getFilteredGifts(categoryId: number | null, priceType: number | null): Observabl
   }
 
   getDonors(): Observable<any[]> {
-    return this.http.get<any[]>(this.donorUrl, { headers: this.getHeaders() });
+    return this.http.get<any[]>(this.donorUrl);
   }
   getSortedGiftsByOrg( sortBy: string): Observable<GiftDto[]> {
     const params = new HttpParams().set('sortBy', sortBy);

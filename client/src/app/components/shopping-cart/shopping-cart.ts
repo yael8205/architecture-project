@@ -21,7 +21,7 @@ export class ShoppingCart implements OnInit {
   private messageService = inject(MessageService);
     private router = inject(Router); 
   totalPrice = computed(() => this.cartService.cart()?.sumPrice || 0);
-isLoggedIn = computed(() => !!localStorage.getItem('token'));
+isLoggedIn = computed(() => !!localStorage.getItem('user'));
   ngOnInit() {
     if (this.isLoggedIn()) {
     this.loadCart();}

@@ -5,7 +5,7 @@
 
     { 
         public record OrganizationResponseDto(
-            int Id,
+            string Id,
             string Slug,
             string Name,
             string PrimaryColor,

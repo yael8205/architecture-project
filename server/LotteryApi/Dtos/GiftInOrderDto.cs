@@ -6,9 +6,9 @@ namespace LotteryApi.Dtos
 {
     public class GiftInOrderDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = null!;
      
-        public int GiftId { get; set; }
+        public string GiftId { get; set; } = null!;
 
         public string GiftName { get; set; }
         public string GiftPictureUrl { get; set; }

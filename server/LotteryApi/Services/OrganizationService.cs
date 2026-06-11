@@ -33,7 +33,7 @@ namespace LotteryApi.Services
 
         public async Task UpdateAsync(int id, OrganizationUpdateDto dto)
         {
-            var org = await _organizationRepository.GetByIdAsync(id) ?? throw new NotFoundException("ארגון לא נמצא");
+            var org = await _organizationRepository.GetByIdAsync(id.ToString()) ?? throw new NotFoundException("ארגון לא נמצא");
 
             org.Name = dto.Name;
             org.PrimaryColor = dto.PrimaryColor;
@@ -48,7 +48,7 @@ namespace LotteryApi.Services
 
         public async Task DeleteAsync(int id)
         {
-            var org = await _organizationRepository.GetByIdAsync(id) ?? throw new NotFoundException("ארגון לא נמצא");
+            var org = await _organizationRepository.GetByIdAsync(id.ToString()) ?? throw new NotFoundException("ארגון לא נמצא");
             _organizationRepository.Delete(org);
             await _organizationRepository.SaveChangesAsync();
         }

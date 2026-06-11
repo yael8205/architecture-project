@@ -1,15 +1,19 @@
-using LotteryApi.Data;
+using LotteryApi.Configuration;
+using LotteryApi.Models;
 using LotteryApi.Repositories;
 using LotteryApi.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 using LotteryApi.Middleware;
+using Microsoft.AspNetCore.RateLimiting;
+using MongoDB.Driver;
 using Serilog;
+using System.Threading.RateLimiting;
 
 
 
@@ -50,36 +54,56 @@ try
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "הכניסו את הטוקן בפורמט: Bearer {your_token}"
+            Description = "Enter: Bearer {your_jwt_token}"
         });
         options.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
-        {
-            new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-            },
-            new string[] {}
-        }
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
         });
     });
     builder.Services.AddCors(options =>
     {
-        options.AddPolicy("AllowAngular",
-            policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        options.AddPolicy("AllowAngular", policy =>
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials());
     });
-    builder.Services.AddDbContext<LotteryDbContext>(options =>
-    //options.UseSqlServer("Server=Srv2\\pupils;Database=LotteryDB;Integrated Security=SSPI;Persist Security Info=False;TrustServerCertificate=True;"));
 
-    options.UseSqlServer("Server=DESKTOP-PKVNNGR;Database=LotteryDB;Integrated Security=SSPI;Persist Security Info=False;TrustServerCertificate=True;"));
-    //builder.Services.AddControllers()
-    //    .AddJsonOptions(options =>
-    //    {
-    //        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    //    });
+    var mongoSection = builder.Configuration.GetSection("MongoDb");
+    builder.Services.Configure<MongoDbSettings>(mongoSection);
+    var mongoSettings = mongoSection.Get<MongoDbSettings>()
+        ?? throw new InvalidOperationException("MongoDb settings are not configured.");
+
+    builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoSettings.ConnectionString));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoClient>().GetDatabase(mongoSettings.DatabaseName));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<PackageModel>("Packages"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<UserModel>("Users"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<CategoryModel>("Categories"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<DonorModel>("Donors"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<Organization>("Organizations"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<OrderModel>("Orders"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<ShoppingCartModel>("ShoppingCarts"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<GiftModel>("Gifts"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<GiftInCartModel>("GiftsInCart"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<GiftInOrderModel>("GiftsInOrder"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<PackageInCartModel>("PackagesInCart"));
+    builder.Services.AddSingleton(sp => sp.GetRequiredService<IMongoDatabase>().GetCollection<PackageInOrderModel>("PackagesInOrder"));
+
     builder.Services.AddHttpContextAccessor();
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-    var secretKey = jwtSettings["SecretKey"] ?? "YourFallbackVerySecretKey123!";
+    var jwtSection = builder.Configuration.GetSection("Jwt");
+    var secretKey = jwtSection["Key"]
+        ?? throw new InvalidOperationException("Jwt:Key is not configured");
     builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,13 +113,29 @@ try
         {
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true, // אימות שולח הטוקן
-                ValidateAudience = true, // אימות קהל היעד
-                ValidateLifetime = true, // בדיקה שהטוקן לא פג תוקף
-                ValidateIssuerSigningKey = true, // אימות חתימת הטוקן
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSection["Issuer"],
+                ValidAudience = jwtSection["Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                RoleClaimType = ClaimTypes.Role
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsJsonAsync(new
+                    {
+                        status = 401,
+                        message = "Unauthorized"
+                    });
+                }
             };
         });
     builder.Services.AddAuthorization();
@@ -127,6 +167,30 @@ try
     builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
     builder.Services.AddScoped<IOrganizationService, OrganizationService>();
 
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = builder.Configuration["Redis:Configuration"] ?? "localhost:6379";
+        options.InstanceName = builder.Configuration["Redis:InstanceName"] ?? "LotteryInstance_";
+    });
+
+    builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection("CacheSettings"));
+
+    // ׳”׳’׳“׳¨׳× ׳”-Policy
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.AddPolicy("fixed", _ => RateLimitPartition.GetSlidingWindowLimiter(
+            partitionKey: "global",
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                Window = TimeSpan.FromMinutes(1),
+                PermitLimit = 100,
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+                SegmentsPerWindow = 4
+            }));
+
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    });
     var app = builder.Build();
 
     if (app.Environment.IsDevelopment())
@@ -138,9 +202,12 @@ try
     app.UseHttpsRedirection();
     app.UseCors("AllowAngular");
     app.UseMiddleware<ExceptionMiddleware>();
+    app.UseMiddleware<JwtCookieMiddleware>();
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    app.UseRateLimiter();
+
 
     app.Run();
 }

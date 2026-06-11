@@ -1,9 +1,15 @@
-﻿namespace LotteryApi.Models
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace LotteryApi.Models
 {
     public class Organization
     {
-        public int Id { get; set; }
-        public required string Slug { get; set; } 
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
+        public required string Slug { get; set; }
         public required string Name { get; set; }
         public string PrimaryColor { get; set; } = "#F26522";
         public string SecondaryColor { get; set; } = "#F8F9FA";

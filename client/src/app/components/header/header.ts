@@ -3,7 +3,9 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { AuthService } from '../../../services/auth.service';
 import { OrgService } from '../../../services/org.service';
+import { UserRole } from '../../../models/auth.model';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -15,6 +17,7 @@ import { filter } from 'rxjs/operators';
 })
 export class Header implements OnInit {
   private orgService = inject(OrgService);
+  private authService = inject(AuthService);
   private router = inject(Router);
 
   isAdmin = signal(false);
@@ -45,23 +48,36 @@ export class Header implements OnInit {
   }
 
   private checkAuth() {
-    const token = localStorage.getItem('token');
-    this.isLoggedIn.set(!!token);
-    if (token) {
+    const userJson = localStorage.getItem('user');
+    this.isLoggedIn.set(!!userJson);
+    if (userJson) {
       try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const role = payload['role'] || payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-        this.isAdmin.set(role === 'Admin' || role === 'Manager');
-      } catch { this.isAdmin.set(false); }
+        const user = JSON.parse(userJson);
+        this.isAdmin.set(user.role === UserRole.Manager || user.role === 'Manager' || user.role === 'Admin');
+      } catch {
+        this.isAdmin.set(false);
+      }
     } else {
       this.isAdmin.set(false);
     }
   }
 
   logout() {
-    localStorage.removeItem('token');
-    this.router.navigate([`/join/${this.slug()}`]).then(() => {
-      window.location.reload(); 
+    this.authService.logout().subscribe({
+      complete: () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        this.router.navigate([`/join/${this.slug()}`]).then(() => {
+          window.location.reload();
+        });
+      },
+      error: () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        this.router.navigate([`/join/${this.slug()}`]).then(() => {
+          window.location.reload();
+        });
+      }
     });
   }
 }

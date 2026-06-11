@@ -1,32 +1,43 @@
 ﻿using LotteryApi.Enums;
 using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class GiftModel: ITenantEntity
+    public class GiftModel : ITenantEntity
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
         [Required]
         public string Name { get; set; }
-        
+
         public string? Description { get; set; }
+
         [Required]
-        public int CategoryId { get; set; }
+        public string CategoryId { get; set; } = null!;
+
         [ForeignKey("CategoryId")]
         public CategoryModel Category { get; set; }
+
         public int PrizeQuantity { get; set; } = 1;
+
         [Required]
         public CardPriceEnum CardPrice { get; set; }
+
         public string? PictureUrl { get; set; }
+
         [Required]
-        public int DonorId { get; set; }
+        public string DonorId { get; set; } = null!;
+
         [ForeignKey("DonorId")]
         public DonorModel Donor { get; set; }
-        public int OrganizationId { get; set; }
+
+        public string OrganizationId { get; set; } = null!;
         public ICollection<GiftInOrderModel> GifPurchased { get; set; } = new List<GiftInOrderModel>();
-
-
     }
 }

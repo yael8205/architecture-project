@@ -8,8 +8,7 @@ namespace LotteryApi.Services
 {
     public interface ITokenService
     {
-        // הוספנו את organizationId כפרמטר
-        string GenerateToken(int userId, string email, string name, UserRoleEnum role, int organizationId);
+        string GenerateToken(string userId, string email, string name, UserRoleEnum role, string organizationId);
     }
 
     public class TokenService : ITokenService
@@ -21,27 +20,28 @@ namespace LotteryApi.Services
             _configuration = configuration;
         }
 
-        public string GenerateToken(int userId, string email, string name, UserRoleEnum role, int organizationId)
+        public string GenerateToken(string userId, string email, string name, UserRoleEnum role, string organizationId)
         {
-            var jwtSettings = _configuration.GetSection("JwtSettings");
-            var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
-            var expiryMinutes = int.Parse(jwtSettings["ExpiryMinutes"] ?? "60");
+            var jwtSection = _configuration.GetSection("Jwt");
+            var secretKey = jwtSection["Key"]
+                ?? throw new InvalidOperationException("JWT Key is not configured in Jwt:Key");
+            var issuer = jwtSection["Issuer"];
+            var audience = jwtSection["Audience"];
+            var expiryMinutes = int.Parse(jwtSection["ExpiryMinutes"] ?? "60");
 
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var roleClaim = MapRoleToClaim(role);
 
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
                 new Claim(JwtRegisteredClaimNames.Email, email),
                 new Claim(JwtRegisteredClaimNames.Name, name),
-                new Claim(ClaimTypes.Role, role.ToString()),
+                new Claim(ClaimTypes.Role, roleClaim),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-                
-                // השורה החדשה והחשובה:
                 new Claim("OrganizationId", organizationId.ToString())
             };
 
@@ -55,5 +55,12 @@ namespace LotteryApi.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        private static string MapRoleToClaim(UserRoleEnum role) =>
+            role switch
+            {
+                UserRoleEnum.Manager => "Admin",
+                _ => role.ToString()
+            };
     }
 }

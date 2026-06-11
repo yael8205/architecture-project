@@ -6,9 +6,9 @@ namespace LotteryApi.Dtos
 {
     public class PackageInCartDto
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = null!;
 
-        public int PackageId { get; set; }
+        public string PackageId { get; set; } = null!;
         
         public string PackageName { get; set; }
         public int PackagePrice { get; set; }
@@ -19,6 +19,6 @@ namespace LotteryApi.Dtos
     public class PackageInCartCreateDto
     {
         [Required]
-        public int PackageId { get; set; }
+        public string PackageId { get; set; } = null!;
     }
 }

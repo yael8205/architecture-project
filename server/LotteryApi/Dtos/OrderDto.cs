@@ -7,8 +7,8 @@ namespace LotteryApi.Dtos
     public class OrderDto
     {
        
-            public int Id { get; set; }
-            public int ParticipantId { get; set; }    
+            public string Id { get; set; } = null!;
+            public string ParticipantId { get; set; } = null!;    
             public string ParticipantName { get; set; }
             public ICollection<PackageInOrderDto> PackagesInOrder { get; set; } = new List<PackageInOrderDto>();
             public int SumPrice { get; set; }
@@ -18,7 +18,7 @@ namespace LotteryApi.Dtos
     public class OrderCreateDto
     {
         [Required]
-        public int ParticipantId { get; set; }
+        public string ParticipantId { get; set; } = null!;
         [Required]
         public ICollection<PackageInOrderDto> PackagesInOrder { get; set; } = new List<PackageInOrderDto>();
         [Required]

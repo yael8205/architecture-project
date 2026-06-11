@@ -1,24 +1,36 @@
 ﻿using LotteryApi.Enums;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace LotteryApi.Models
 {
-    public class UserModel: ITenantEntity
+    public class UserModel : ITenantEntity
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
         [Required]
         public string Name { get; set; }
-        [Required,MinLength(6),MaxLength(20)]
+
+        [Required, MinLength(6), MaxLength(20)]
         public string Password { get; set; }
-        [Required,EmailAddress]
+
+        [Required, EmailAddress]
         public string Email { get; set; }
-        [Required,Phone]
+
+        [Required, Phone]
         public string Phone { get; set; }
+
         [Required]
         public string Address { get; set; }
+
         [Required]
         public UserRoleEnum Role { get; set; } = UserRoleEnum.Participant;
-        public int OrganizationId { get; set; }
+
+        public string OrganizationId { get; set; } = null!;
+
         public ICollection<OrderModel> Orders { get; set; } = new List<OrderModel>();
     }
 }

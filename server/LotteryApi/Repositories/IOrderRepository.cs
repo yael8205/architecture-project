@@ -5,7 +5,7 @@ namespace LotteryApi.Repositories
     public interface IOrderRepository
     {
         Task<OrderModel> CreateOrderAsync(OrderModel order);
-        Task<OrderModel?> GetOrderByIdAsync(int id);
+        Task<OrderModel?> GetOrderByIdAsync(string id);
         Task<IEnumerable<OrderModel>> GetOrdersAsync();
     }
 }

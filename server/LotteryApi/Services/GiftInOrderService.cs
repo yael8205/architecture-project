@@ -14,7 +14,7 @@ namespace LotteryApi.Services
 
         public async Task<GiftInOrderDto?> GetGiftInOrderByIdAsync(int id)
         {
-            var giftInOrder = await _giftInOrderRepositorycs.GetGiftInOrderByIdAsync(id);
+            var giftInOrder = await _giftInOrderRepositorycs.GetGiftInOrderByIdAsync(id.ToString());
             return giftInOrder != null ? new GiftInOrderDto
             {
                 Id = giftInOrder.Id,

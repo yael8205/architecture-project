@@ -50,7 +50,7 @@ namespace LotteryApi.Services
 
 
 
-        public async Task<OrderDto?> GetOrderByIdAsync(int id)
+        public async Task<OrderDto?> GetOrderByIdAsync(string id)
         {
             var order = await _orderRepository.GetOrderByIdAsync(id);
 

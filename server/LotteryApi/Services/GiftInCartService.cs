@@ -19,7 +19,7 @@ namespace LotteryApi.Services
 
         public async Task<GiftInCartDto?> GetGiftInCartByIdAsync(int id)
         {
-            var giftInCart = await _giftInCartRepository.GetGiftInCartByIdAsync(id);
+            var giftInCart = await _giftInCartRepository.GetGiftInCartByIdAsync(id.ToString());
             return giftInCart != null ? new GiftInCartDto
             {
                 Id = giftInCart.Id,
@@ -34,7 +34,7 @@ namespace LotteryApi.Services
         public async Task<GiftInCartDto?> GetGiftInCartByIdAndByPackageAsync(int giftid, int packageInCartId)
         {
 
-            var giftInCart = await _giftInCartRepository.GetGiftInCartByIdAndByPackageAsync(giftid, packageInCartId);
+            var giftInCart = await _giftInCartRepository.GetGiftInCartByIdAndByPackageAsync(giftid.ToString(), packageInCartId.ToString());
 
             return giftInCart != null ? new GiftInCartDto
             {
@@ -123,7 +123,7 @@ namespace LotteryApi.Services
         }
         public async Task<bool> DeleteGiftInCartAsync(int id)
         {
-            return await _giftInCartRepository.DeleteGiftInCartAsync(id);
+            return await _giftInCartRepository.DeleteGiftInCartAsync(id.ToString());
         }
     }
 }

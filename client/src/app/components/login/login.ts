@@ -56,17 +56,16 @@ private router = inject(Router);
     this.authService.login(this.user).subscribe({
       next: (response) => {
         this.isLoading = false;
-        if (response && response.token) {
-        localStorage.setItem('token', response.token);
-        if (response.user) {
-        localStorage.setItem('user', JSON.stringify(response.user));
+        if (response?.user) {
+          localStorage.setItem('user', JSON.stringify(response.user));
+          localStorage.removeItem('token');
+          this.router.navigate(['/join', this.orgService.currentOrg()?.slug, 'organizations']);
+          window.location.href = `/join/${this.orgService.currentOrg()?.slug}`;
+        } else {
+          console.error('התקבלה תשובה מהשרת ללא נתוני משתמש', response);
+          alert('חלה שגיאה בקבלת נתוני הגישה מהשרת.');
         }
-            this.router.navigate(['/join', this.orgService.currentOrg()?.slug, 'organizations']);
-        window.location.href = `/join/${this.orgService.currentOrg()?.slug}`; 
-     }else {
-    console.error('התקבלה תשובה מהשרת ללא טוקן', response);
-    alert('חלה שגיאה בקבלת נתוני הגישה מהשרת.');
-  }},
+      },
      error: (err) => {
         this.isLoading = false;
         console.error('שגיאה בהתחברות:', err);

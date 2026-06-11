@@ -1,32 +1,20 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class PackageInOrderRepository : IPackageInOrderRepository
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public PackageInOrderRepository(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<PackageInOrderModel> _packagesInOrder;
+
+        public PackageInOrderRepository(IMongoCollection<PackageInOrderModel> packagesInOrder)
         {
-            _lotteryContext = lotteryDbContext;
+            _packagesInOrder = packagesInOrder;
         }
 
-        public async Task<PackageInOrderModel?> GetPackageInOrderByIdAsync(int id)
+        public async Task<PackageInOrderModel?> GetPackageInOrderByIdAsync(string id)
         {
-            return await _lotteryContext.PackagesInOrder
-                .Include(x => x.Package)
-                .Include(p => p.GiftsInPackage)
-                 .ThenInclude(g => g.Gift)
-               .FirstOrDefaultAsync(p => p.Id == id);
+            return await _packagesInOrder.Find(p => p.Id == id).FirstOrDefaultAsync();
         }
-        //public async Task<bool> CreatePackagesAndGiftsInCartAsync(List<PackageInOrderModel>packages)
-        //{
-
-        //    _lotteryContext.PackagesInOrder.AddRange(packages);
-
-        //    await _lotteryContext.SaveChangesAsync();
-        //    return true;
-        //}
     }
 }

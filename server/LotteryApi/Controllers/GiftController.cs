@@ -33,14 +33,14 @@ namespace LotteryApi.Controllers
             }
             return Ok(gift);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<GiftDto>> CreateGiftAsync([FromBody] GiftCreateDto gift)
         {
             var newGift = await _giftService.CreateGiftAsync(gift);
             return Ok(newGift);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<GiftDto>> UpdatePackageAsync(int id, [FromBody] GiftUpdateDto gift)
         {
@@ -51,7 +51,7 @@ namespace LotteryApi.Controllers
             }
             return Ok(updateGift);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteGiftAsync(int id)
         {

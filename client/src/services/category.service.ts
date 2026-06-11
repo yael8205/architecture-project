@@ -17,28 +17,22 @@ export class CategoryService { // שיניתי את שם ה-Class ל-CategorySer
     return this.http.get<CategoryDto[]>(this.apiUrl);
   }
 
-  private getHeaders() {
-    const token = localStorage.getItem('token');
-    return { 'Authorization': `Bearer ${token}` };
-  }
-
-  // שליפת קטגוריה לפי ID
   getCategoryById(id: number): Observable<CategoryDto> {
     return this.http.get<CategoryDto>(`${this.apiUrl}/${id}`);
   }
 
   // יצירת קטגוריה חדשה
   createCategory(category: CategoryCreateDto): Observable<CategoryDto> {
-    return this.http.post<CategoryDto>(this.apiUrl, category, { headers: this.getHeaders() });
+    return this.http.post<CategoryDto>(this.apiUrl, category);
   }
 
   // עדכון קטגוריה קיימת
   updateCategory(id: number, category: CategoryUpdateDto): Observable<void> {
-    return this.http.put<void>(`${this.apiUrl}/${id}`, category, { headers: this.getHeaders() });
+    return this.http.put<void>(`${this.apiUrl}/${id}`, category);
   }
 
   // מחיקת קטגוריה
   deleteCategory(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

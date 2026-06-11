@@ -70,7 +70,7 @@ namespace LotteryApi.Services
         }
         public async Task<GiftDto?> GetGiftByIdAsync(int id)
         {
-            var gift = await _giftRepository.GetGiftByIdAsync(id);
+            var gift = await _giftRepository.GetGiftByIdAsync(id.ToString());
             return gift != null ? new GiftDto
             {
                 Id = gift.Id,
@@ -141,7 +141,7 @@ namespace LotteryApi.Services
 
         public async Task<GiftDto?> UpdateGiftAsync(int id, GiftUpdateDto updateGift)
         {
-            var existing = await _giftRepository.GetGiftByIdAsync(id);
+            var existing = await _giftRepository.GetGiftByIdAsync(id.ToString());
             if (existing == null)
             {
                 return null;
@@ -182,7 +182,7 @@ namespace LotteryApi.Services
         }
         public async Task<bool> DeleteGiftAsync(int id)
         {
-            return await _giftRepository.DeleteGiftAsync(id);
+            return await _giftRepository.DeleteGiftAsync(id.ToString());
         }
         public async Task<IEnumerable<GiftDto>> SearchGiftsAsync(string? giftName, string? donorName, int? minPurchasers)
         {

@@ -1,21 +1,20 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
 
 namespace LotteryApi.Repositories
 {
     public class GiftInOrderRepositorycs : IGiftInOrderRepositorycs
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public GiftInOrderRepositorycs(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<GiftInOrderModel> _giftsInOrder;
+
+        public GiftInOrderRepositorycs(IMongoCollection<GiftInOrderModel> giftsInOrder)
         {
-            _lotteryContext = lotteryDbContext;
+            _giftsInOrder = giftsInOrder;
         }
-        public async Task<GiftInOrderModel?> GetGiftInOrderByIdAsync(int id)
+
+        public async Task<GiftInOrderModel?> GetGiftInOrderByIdAsync(string id)
         {
-            return await _lotteryContext.GiftsInOrder
-            .Include(g => g.Gift)
-            .FirstOrDefaultAsync(p => p.Id == id);
+            return await _giftsInOrder.Find(g => g.Id == id).FirstOrDefaultAsync();
         }
     }
 }

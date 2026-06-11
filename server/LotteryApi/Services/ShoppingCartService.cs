@@ -18,7 +18,7 @@ namespace LotteryApi.Services
 
         public async Task<ShoppingCartDto?> GetShoppingCartByIdAsync(int id)
         {
-            var shoppingCart = await _shoppingCartRepository.GetShoppingCartByIdAsync(id);
+            var shoppingCart = await _shoppingCartRepository.GetShoppingCartByIdAsync(id.ToString());
 
             return shoppingCart != null ? new ShoppingCartDto
             {
@@ -46,7 +46,7 @@ namespace LotteryApi.Services
         }
         public async Task<ShoppingCartDto?> GetShoppingCartByUserIdAsync(int id)
         {
-            var shoppingCart = await _shoppingCartRepository.GetShoppingCartByUserIdAsync(id);
+            var shoppingCart = await _shoppingCartRepository.GetShoppingCartByUserIdAsync(id.ToString());
 
             return shoppingCart != null ? new ShoppingCartDto
             {
@@ -74,7 +74,7 @@ namespace LotteryApi.Services
         }
         public async Task<ShoppingCartDto> CreateShoppingCartAsync(ShoppingCartCreateDto shoppingcart)
         {
-            if (shoppingcart == null || shoppingcart.ParticipantId == 0)
+            if (shoppingcart == null || string.IsNullOrEmpty(shoppingcart.ParticipantId))
             {
                 throw new BadRequestException("נתוני סל הקניות אינם תקינים.");
             }
@@ -108,11 +108,11 @@ namespace LotteryApi.Services
 
         public async Task<bool> DeleteShoppingCartAsync(int id)
         {
-            return await _shoppingCartRepository.DeleteShoppingCartAsync(id);
+            return await _shoppingCartRepository.DeleteShoppingCartAsync(id.ToString());
         }
         public async Task<bool> EmptyCartAsync(int id)
         {
-            return await _shoppingCartRepository.EmptyCartAsync(id);
+            return await _shoppingCartRepository.EmptyCartAsync(id.ToString());
         }
     }
 

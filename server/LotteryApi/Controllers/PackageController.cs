@@ -25,7 +25,7 @@ namespace LotteryApi.Controllers
         }
        
         [HttpGet("{id}")]
-        public async Task<ActionResult<PackageDto>> GetPackageByIdAsync(int id)
+        public async Task<ActionResult<PackageDto>> GetPackageByIdAsync(string id)
         {
             var package = await _packageService.GetPackageByIdAsync(id);
             if (package == null)
@@ -34,16 +34,16 @@ namespace LotteryApi.Controllers
             }
             return Ok(package);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<PackageDto>> CreatePackageAsync([FromBody] PackageCreateDto package)
         {
             var newPackage = await _packageService.CreatePackageAsync(package);
             return Ok(newPackage);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
-        public async Task<ActionResult<PackageDto>> UpdatePackageAsync(int id, [FromBody] PackageUpdateDto package)
+        public async Task<ActionResult<PackageDto>> UpdatePackageAsync(string id, [FromBody] PackageUpdateDto package)
         {
             var updatePackage = await _packageService.UpdatePackageAsync(id, package);
             if (updatePackage == null)
@@ -52,9 +52,9 @@ namespace LotteryApi.Controllers
             }
             return Ok(updatePackage);
         }
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePackageAsync(int id)
+        public async Task<ActionResult> DeletePackageAsync(string id)
         {
             var isDeleted = await _packageService.DeletePackageAsync(id);
             if (!isDeleted)

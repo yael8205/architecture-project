@@ -22,7 +22,7 @@ namespace LotteryApi.Services
         }
         public async Task<CategoryDto?> GetCategoryByIdAsync(int id)
         {
-            var category = await _categoryRepository.GetCategoryByIdAsync(id);
+            var category = await _categoryRepository.GetCategoryByIdAsync(id.ToString());
             return category != null ? new CategoryDto { Id = category.Id, Name = category.Name } : null;
         }
 
@@ -39,7 +39,7 @@ namespace LotteryApi.Services
 
         public async Task<CategoryDto?> UpdateCategoryAsync(int id, CategoryUpdateDto updateCategory)
         {
-            var existing = await _categoryRepository.GetCategoryByIdAsync(id);
+            var existing = await _categoryRepository.GetCategoryByIdAsync(id.ToString());
             if (existing == null)
             {
                 return null;
@@ -50,7 +50,7 @@ namespace LotteryApi.Services
         }
         public async Task<bool> DeleteCategoryAsync(int id)
         {
-            return await _categoryRepository.DeleteCategoryAsync(id);
+            return await _categoryRepository.DeleteCategoryAsync(id.ToString());
         }
 
     }

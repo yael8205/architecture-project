@@ -34,7 +34,7 @@ namespace LotteryApi.Services
 
         public async Task<UserDto?> GetUserByIdAsync(int id)
         {
-            var user = await _userRepository.GetUserByIdAsync(id);
+            var user = await _userRepository.GetUserByIdAsync(id.ToString());
             return user != null ? MapToResponseDto(user) : null;
         }
 
@@ -66,7 +66,7 @@ namespace LotteryApi.Services
 
         public async Task<UserDto?> UpdateUserAsync(int id, UserUpdateDto userupdateDto)
         {
-            var existingUser = await _userRepository.GetUserByIdAsync(id);
+            var existingUser = await _userRepository.GetUserByIdAsync(id.ToString());
             if (existingUser == null) return null;
 
             if (userupdateDto.Email != null && userupdateDto.Email != existingUser.Email)
@@ -89,7 +89,7 @@ namespace LotteryApi.Services
 
         public async Task<bool> DeleteUserAsync(int id)
         {
-            return await _userRepository.DeleteUserAsync(id);
+            return await _userRepository.DeleteUserAsync(id.ToString());
         }
 
         public async Task<LoginResponseDto?> AuthenticateAsync(string email, string password)
@@ -111,7 +111,7 @@ namespace LotteryApi.Services
             }
 
             var token = _tokenService.GenerateToken(user.Id, user.Email, user.Name, user.Role, user.OrganizationId);
-            var expiryMinutes = _configuration.GetValue<int>("JwtSettings:ExpiryMinutes", 60);
+            var expiryMinutes = _configuration.GetValue<int>("Jwt:ExpiryMinutes", 60);
 
             //_logger.LogInformation("User {UserId} authenticated successfully", user.Id);
 

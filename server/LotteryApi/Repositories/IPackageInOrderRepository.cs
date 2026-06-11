@@ -4,6 +4,6 @@ namespace LotteryApi.Repositories
 {
     public interface IPackageInOrderRepository
     {
-        Task<PackageInOrderModel?> GetPackageInOrderByIdAsync(int id);
+        Task<PackageInOrderModel?> GetPackageInOrderByIdAsync(string id);
     }
 }

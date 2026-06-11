@@ -1,22 +1,29 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LotteryApi.Models
 {
-    public class PackageInCartModel: ITenantEntity
+    public class PackageInCartModel : ITenantEntity
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = null!;
+
         [Required]
-        public int PackageId { get; set; }
+        public string PackageId { get; set; } = null!;
+
         [ForeignKey("PackageId")]
         public PackageModel Package { get; set; }
+
         [Required]
-        public int CartId { get; set; }
+        public string CartId { get; set; } = null!;
+
         [ForeignKey("CartId")]
         public ShoppingCartModel ShoppingCart { get; set; }
 
-        public int OrganizationId { get; set; }
+        public string OrganizationId { get; set; } = null!;
         public ICollection<GiftInCartModel> GiftsInPackage { get; set; } = new List<GiftInCartModel>();
-
     }
 }

@@ -1,0 +1,159 @@
+[
+  {
+    "orderId": 1001,
+    "participantId": 501,
+    "sumPrice": 450,
+    "date": "2026-05-14",
+    "organizationId": 1,
+    "participant": {
+      "id": 501,
+      "name": "Miriam Levy",
+      "email": "miriam.levy@example.com",
+      "phone": "+972501234567",
+      "address": "Rehov HaShalom 12, Tel Aviv",
+      "role": "Participant",
+      "organizationId": 1
+    },
+    "packagesInOrder": [
+      {
+        "packageInOrderId": 2001,
+        "packageId": 301,
+        "priceAtPurchase": 250,
+        "organizationId": 1,
+        "package": {
+          "id": 301,
+          "name": "Family Gift Package",
+          "price": 250,
+          "qtyClassicCards": 5,
+          "qtySpecialCards": 2,
+          "qtyPrimumCards": 1,
+          "organizationId": 1
+        },
+        "giftsInPackage": [
+          {
+            "giftInOrderId": 4001,
+            "giftId": 601,
+            "isWinner": false,
+            "organizationId": 1,
+            "gift": {
+              "id": 601,
+              "name": "Spa Voucher",
+              "description": "Weekend spa experience",
+              "categoryId": 10,
+              "category": {
+                "id": 10,
+                "name": "Wellness",
+                "organizationId": 1
+              },
+              "prizeQuantity": 1,
+              "cardPrice": 2,
+              "pictureUrl": "https://example.com/images/spa-voucher.jpg",
+              "donorId": 20,
+              "donor": {
+                "id": 20,
+                "name": "Health Fund",
+                "phone": "+972549876543",
+                "email": "contact@healthfund.org",
+                "organizationId": 1
+              },
+              "organizationId": 1
+            }
+          },
+          {
+            "giftInOrderId": 4002,
+            "giftId": 602,
+            "isWinner": false,
+            "organizationId": 1,
+            "gift": {
+              "id": 602,
+              "name": "Wine Basket",
+              "description": "Premium kosher wine basket",
+              "categoryId": 11,
+              "category": {
+                "id": 11,
+                "name": "Food & Drink",
+                "organizationId": 1
+              },
+              "prizeQuantity": 1,
+              "cardPrice": 1,
+              "pictureUrl": "https://example.com/images/wine-basket.jpg",
+              "donorId": 21,
+              "donor": {
+                "id": 21,
+                "name": "Kosher Gifts Co.",
+                "phone": "+972542112233",
+                "email": "sales@koshergifts.co.il",
+                "organizationId": 1
+              },
+              "organizationId": 1
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "orderId": 1002,
+    "participantId": 502,
+    "sumPrice": 340,
+    "date": "2026-05-15",
+    "organizationId": 1,
+    "participant": {
+      "id": 502,
+      "name": "Eitan Cohen",
+      "email": "eitan.cohen@example.com",
+      "phone": "+972502345678",
+      "address": "Rehov HaDavid 7, Jerusalem",
+      "role": "Participant",
+      "organizationId": 1
+    },
+    "packagesInOrder": [
+      {
+        "packageInOrderId": 2002,
+        "packageId": 302,
+        "priceAtPurchase": 340,
+        "organizationId": 1,
+        "package": {
+          "id": 302,
+          "name": "Premium Prize Pack",
+          "price": 340,
+          "qtyClassicCards": 3,
+          "qtySpecialCards": 3,
+          "qtyPrimumCards": 2,
+          "organizationId": 1
+        },
+        "giftsInPackage": [
+          {
+            "giftInOrderId": 4003,
+            "giftId": 603,
+            "isWinner": false,
+            "organizationId": 1,
+            "gift": {
+              "id": 603,
+              "name": "Smartwatch",
+              "description": "Fitness smartwatch with GPS",
+              "categoryId": 12,
+              "category": {
+                "id": 12,
+                "name": "Electronics",
+                "organizationId": 1
+              },
+              "prizeQuantity": 1,
+              "cardPrice": 3,
+              "pictureUrl": "https://example.com/images/smartwatch.jpg",
+              "donorId": 22,
+              "donor": {
+                "id": 22,
+                "name": "Tech Gifts Ltd.",
+                "phone": "+972532223344",
+                "email": "info@techgifts.co.il",
+                "organizationId": 1
+              },
+              "organizationId": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

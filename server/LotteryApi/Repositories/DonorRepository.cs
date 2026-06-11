@@ -1,73 +1,60 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Dtos;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
+using System.Linq;
 
 namespace LotteryApi.Repositories
 {
     public class DonorRepository : IDonorRepository
     {
-        private readonly LotteryDbContext _lotteryContext;
-        public DonorRepository(LotteryDbContext lotteryDbContext)
+        private readonly IMongoCollection<DonorModel> _donors;
+
+        public DonorRepository(IMongoCollection<DonorModel> donors)
         {
-            _lotteryContext = lotteryDbContext;
+            _donors = donors;
         }
+
         public async Task<IEnumerable<DonorModel>> GetDonorsAsync()
         {
-            return await _lotteryContext.Donors
-                .Include(d => d.Gifts)
-                .ToListAsync();
+            return await _donors.Find(_ => true).ToListAsync();
         }
-        public async Task<DonorModel?> GetDonorsByIdAsync(int id)
+
+        public async Task<DonorModel?> GetDonorsByIdAsync(string id)
         {
-            return await _lotteryContext.Donors
-                 .Include(d => d.Gifts)
-                .FirstOrDefaultAsync(c => c.Id == id);
+            return await _donors.Find(d => d.Id == id).FirstOrDefaultAsync();
         }
+
         public async Task<DonorModel> CreateDonorsAsync(DonorModel donor)
         {
-            _lotteryContext.Donors.Add(donor);
-            await _lotteryContext.SaveChangesAsync();
+            await _donors.InsertOneAsync(donor);
             return donor;
         }
+
         public async Task<DonorModel?> UpdateDonorsAsync(DonorModel donor)
         {
-            var existing = await _lotteryContext.Donors.FindAsync(donor.Id);
-            if (existing == null)
-                return null;
-            _lotteryContext.Entry(existing).CurrentValues.SetValues(donor);
-            await _lotteryContext.SaveChangesAsync();
-            return existing;
+            var result = await _donors.ReplaceOneAsync(d => d.Id == donor.Id, donor);
+            return result.MatchedCount == 0 ? null : donor;
+        }
 
-        }
-        public async Task<bool> DeleteDonorsAsync(int id)
+        public async Task<bool> DeleteDonorsAsync(string id)
         {
-            var existing = await _lotteryContext.Donors.FindAsync(id);
-            if (existing == null)
-                return false;
-            _lotteryContext.Donors.Remove(existing);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
+            var result = await _donors.DeleteOneAsync(d => d.Id == id);
+            return result.DeletedCount > 0;
         }
+
         public async Task<IEnumerable<DonorModel>> GetFilteredDonorsAsync(string? name, string? email, string? giftName)
         {
-
-            var query = _lotteryContext.Donors.Include(d => d.Gifts).AsQueryable();
-
+            var filter = Builders<DonorModel>.Filter.Empty;
 
             if (!string.IsNullOrWhiteSpace(name))
-                query = query.Where(d => d.Name.Contains(name));
+                filter &= Builders<DonorModel>.Filter.Regex(d => d.Name, new MongoDB.Bson.BsonRegularExpression(name, "i"));
 
             if (!string.IsNullOrWhiteSpace(email))
-                query = query.Where(d => d.Email.Contains(email));
+                filter &= Builders<DonorModel>.Filter.Regex(d => d.Email, new MongoDB.Bson.BsonRegularExpression(email, "i"));
 
             if (!string.IsNullOrWhiteSpace(giftName))
+                filter &= Builders<DonorModel>.Filter.ElemMatch(d => d.Gifts, Builders<LotteryApi.Models.GiftModel>.Filter.Regex(x => x.Name, new MongoDB.Bson.BsonRegularExpression(giftName, "i")));
 
-                query = query.Where(d => d.Gifts.Any(g => g.Name.Contains(giftName)));
-
-
-            return await query.ToListAsync();
+            return await _donors.Find(filter).ToListAsync();
         }
     }
-
 }

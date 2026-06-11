@@ -16,10 +16,7 @@ private orgService = inject(OrgService);
   // שימוש ב-Signal לניהול הנתונים
   orders = signal<OrderDto[]>([]);
   loading = signal<boolean>(false);
-private getHeaders() {
-    const token = localStorage.getItem('token');
-    return { 'Authorization': `Bearer ${token}` };
-  }
+
   getGiftImagePath(pictureUrl: string | null | undefined): string {
   const slug = this.orgService.currentOrg()?.slug || 'united-hatzalah';
   console.log(`🎬 טוען תמונת מתנה מהנתיב: /${slug}/images/gifts/${pictureUrl}`);
@@ -27,7 +24,7 @@ private getHeaders() {
 }
  getMyOrders(): void {
   this.loading.set(true);
-  this.http.get<OrderDto[]>(`${this.apiUrl}/ByParticipant`, { headers: this.getHeaders() }).subscribe({
+  this.http.get<OrderDto[]>(`${this.apiUrl}/ByParticipant`).subscribe({
     next: (data) => {
       // שינוי חשוב: מיון כך שההזמנה החדשה (ID גבוה) תהיה ראשונה
       const sortedData = data.sort((a, b) => b.id - a.id);
@@ -42,7 +39,7 @@ private getHeaders() {
 }
 createOrder(cart: ShoppingCartDto): Observable<OrderDto> {
     this.loading.set(true);
-    return this.http.post<OrderDto>(this.apiUrl, cart, { headers: this.getHeaders() }).pipe(
+    return this.http.post<OrderDto>(this.apiUrl, cart).pipe(
       tap((newOrder) => {
         // רענון רשימת ההזמנות לאחר הצלחה
         this.getMyOrders();

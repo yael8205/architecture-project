@@ -5,9 +5,9 @@ namespace LotteryApi.Repositories
     public interface IPackageRepository
     {
         Task<PackageModel> CreatePackageAsync(PackageModel package);
-        Task<bool> DeletePackageAsync(int id);
+        Task<bool> DeletePackageAsync(string id);
         Task<IEnumerable<PackageModel>> GetPackageAsync();
-        Task<PackageModel?> GetPackageByIdAsync(int id);
+        Task<PackageModel?> GetPackageByIdAsync(string id);
         Task<PackageModel?> UpdatePackageAsync(PackageModel package);
     }
 }

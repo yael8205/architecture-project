@@ -1,77 +1,59 @@
-﻿using LotteryApi.Data;
-using LotteryApi.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using LotteryApi.Models;
+using MongoDB.Driver;
+using System.Linq;
 
 namespace LotteryApi.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        
-        private readonly LotteryDbContext _lotteryContext;
+        private readonly IMongoCollection<UserModel> _users;
 
-        public UserRepository(LotteryDbContext lotteryContext)
+        public UserRepository(IMongoCollection<UserModel> users)
         {
-            _lotteryContext = lotteryContext;
+            _users = users;
         }
 
         public async Task<IEnumerable<UserModel>> GetUsersAsync()
         {
-            return await _lotteryContext.Users.ToListAsync();
+            return await _users.Find(_ => true).ToListAsync();
         }
 
-        public async Task<UserModel?> GetUserByIdAsync(int id)
+        public async Task<UserModel?> GetUserByIdAsync(string id)
         {
-            return await _lotteryContext.Users
-                .Include(u => u.Orders)
-                .FirstOrDefaultAsync(u => u.Id == id);
+            return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<UserModel?> GetUserByEmailAsync(string email)
         {
-            return await _lotteryContext.Users
-                .FirstOrDefaultAsync(u => u.Email == email);
+            return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
         }
 
         public async Task<UserModel> CreateUserAsync(UserModel user)
         {
-
-
-            _lotteryContext.Users.Add(user);
-            await _lotteryContext.SaveChangesAsync();
+            await _users.InsertOneAsync(user);
             return user;
         }
 
         public async Task<UserModel?> UpdateUserAsync(UserModel user)
         {
-            var existing = await _lotteryContext.Users.FindAsync(user.Id);
-            if (existing == null) return null;
-
-            _lotteryContext.Entry(existing).CurrentValues.SetValues(user);
-
-
-            await _lotteryContext.SaveChangesAsync();
-            return existing;
+            var result = await _users.ReplaceOneAsync(u => u.Id == user.Id, user);
+            return result.MatchedCount == 0 ? null : user;
         }
 
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<bool> DeleteUserAsync(string id)
         {
-            var user = await _lotteryContext.Users.FindAsync(id);
-            if (user == null) return false;
-
-            _lotteryContext.Users.Remove(user);
-            await _lotteryContext.SaveChangesAsync();
-            return true;
+            var result = await _users.DeleteOneAsync(u => u.Id == id);
+            return result.DeletedCount > 0;
         }
 
-        public async Task<bool> ExistsUserAsync(int id)
+        public async Task<bool> ExistsUserAsync(string id)
         {
-            return await _lotteryContext.Users.AnyAsync(u => u.Id == id);
+            return await _users.Find(u => u.Id == id).AnyAsync();
         }
 
         public async Task<bool> EmailExistsUserAsync(string email)
         {
-            return await _lotteryContext.Users.AnyAsync(u => u.Email == email);
+            return await _users.Find(u => u.Email == email).AnyAsync();
         }
-
     }
 }

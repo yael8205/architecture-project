@@ -2,6 +2,6 @@
 {
     public interface ITenantEntity
     {
-        int OrganizationId { get; set; }
+        string OrganizationId { get; set; }
     }
 }

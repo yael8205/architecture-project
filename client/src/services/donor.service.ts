@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DonorDto, DonorCreateDto, DonorUpdateDto } from '../models/donor.model';
-import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -11,43 +10,30 @@ export class DonorService {
   private http = inject(HttpClient);
   private readonly apiUrl = 'https://localhost:7211/api/Donor';
 
-  // פונקציה פרטית לקבלת ה-Headers עם ה-Token
-  private getHeaders() {
-    const token = localStorage.getItem('token');
-    return { 'Authorization': `Bearer ${token}` };
-  }
-
-  // שליפת כל התורמים
   getDonors(): Observable<DonorDto[]> {
-    return this.http.get<DonorDto[]>(this.apiUrl, { headers: this.getHeaders() });
+    return this.http.get<DonorDto[]>(this.apiUrl);
   }
 
-  // שליפת תורם לפי ID
   getDonorById(id: number): Observable<DonorDto> {
-    return this.http.get<DonorDto>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.get<DonorDto>(`${this.apiUrl}/${id}`);
   }
 
-  // יצירת תורם חדש (Name, Phone, Email)
   createDonor(donor: DonorCreateDto): Observable<DonorDto> {
-    return this.http.post<DonorDto>(this.apiUrl, donor, { headers: this.getHeaders() });
+    return this.http.post<DonorDto>(this.apiUrl, donor);
   }
 
-  // עדכון תורם קיים
- updateDonor(id: number, donor: DonorUpdateDto): Observable<void> {
-  // אנחנו מוודאים שה-ID עובר בנתיב, ורק הנתונים הרלוונטיים עוברים ב-Body
-  const body = {
-    name: donor.name,
-    email: donor.email,
-    phone: donor.phone
-  };
-  return this.http.put<void>(`${this.apiUrl}/${id}`, body, { headers: this.getHeaders() });
-}
+  updateDonor(id: number, donor: DonorUpdateDto): Observable<void> {
+    const body = {
+      name: donor.name,
+      email: donor.email,
+      phone: donor.phone
+    };
+    return this.http.put<void>(`${this.apiUrl}/${id}`, body);
+  }
 
-  // מחיקת תורם
   deleteDonor(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
-
 
   getFilteredDonors(name?: string, email?: string, giftName?: string): Observable<DonorDto[]> {
     let params = new HttpParams();
@@ -56,7 +42,6 @@ export class DonorService {
     if (email) params = params.set('email', email);
     if (giftName) params = params.set('giftName', giftName);
 
-    return this.http.get<DonorDto[]>(`${this.apiUrl}/filter`, { params, headers: this.getHeaders() });
+    return this.http.get<DonorDto[]>(`${this.apiUrl}/filter`, { params });
   }
-
 }

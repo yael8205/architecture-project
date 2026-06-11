@@ -21,7 +21,7 @@ namespace LotteryApi.Services
 
         public async Task<PackageInOrderDto?> GetPackageInOrderByIdAsync(int id)
         {
-            var packageInOrder = await _packageInOrderRepository.GetPackageInOrderByIdAsync(id);
+            var packageInOrder = await _packageInOrderRepository.GetPackageInOrderByIdAsync(id.ToString());
 
             return packageInOrder != null ? new PackageInOrderDto
             {

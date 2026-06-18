@@ -175,6 +175,9 @@ try
 
     builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection("CacheSettings"));
 
+    builder.Services.Configure<KafkaSettings>(builder.Configuration.GetSection("Kafka"));
+    builder.Services.AddSingleton<IKafkaProducerService, KafkaProducerService>();
+
     // הגדרת ה-Policy
     builder.Services.AddRateLimiter(options =>
     {

@@ -8,12 +8,14 @@ namespace LotteryApi.Services
     {
         private readonly IOrderRepository _orderRepository;
         private readonly IShoppingCartRepository _shoppingCartRepository;
-        private readonly ILogger<OrderService> _logger; 
+        private readonly IKafkaProducerService _kafkaProducerService;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IOrderRepository orderRepository, IShoppingCartRepository shoppingCartRepository, ILogger<OrderService> logger)
+        public OrderService(IOrderRepository orderRepository, IShoppingCartRepository shoppingCartRepository, IKafkaProducerService kafkaProducerService, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _shoppingCartRepository = shoppingCartRepository;
+            _kafkaProducerService = kafkaProducerService;
             _logger = logger;
         }
 
@@ -112,7 +114,11 @@ namespace LotteryApi.Services
         createOrder.Id, shoppingcart.Id);
             await _shoppingCartRepository.EmptyCartAsync(shoppingcart.Id);
             _logger.LogInformation("Checkout completed for Order {OrderId}", createOrder.Id);
-            return await GetOrderByIdAsync(createOrder.Id);
+
+            var orderDto = await GetOrderByIdAsync(createOrder.Id);
+            await _kafkaProducerService.PublishOrderEventAsync("OrderCreated", orderDto);
+
+            return orderDto;
         }
     }
 }

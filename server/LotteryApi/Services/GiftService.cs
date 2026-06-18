@@ -266,6 +266,9 @@ namespace LotteryApi.Services
                     }).ToList() ?? new List<GiftPurchaserDto>()
             });
         }
+        // NOTE: this method is not wired up (missing _mapper, UserDto, etc.) - it is not active.
+        // Once implemented, publish a Kafka "LotteryDrawn" event here via IKafkaProducerService,
+        // the same way OrderService.CreateShoppingCartAsync publishes "OrderCreated".
         //public async Task<UserDto> RunLotteryForGiftAsync(int giftId)
         //{
         //    // 1. שליפת המתנה עם כל הכרטיסים שנקנו עבורה (GifPurchased)
